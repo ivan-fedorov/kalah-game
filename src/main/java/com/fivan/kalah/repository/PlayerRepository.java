@@ -11,16 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class PlayerRepository {
 
-  private Map<UUID, Player> players = new ConcurrentHashMap<>();
+  private Map<Integer, Player> players = new ConcurrentHashMap<>();
 
-  public Player save(String name) {
-    UUID id = UUID.randomUUID();
-    Player player = new Player(id, name);
-    players.put(id, player);
+  public Player save(Player player) {
+    players.put(player.getId(), player);
     return player;
   }
 
-  public Optional<Player> getById(UUID id) {
+  public Optional<Player> getById(Integer id) {
     return Optional.ofNullable(players.get(id));
   }
 }

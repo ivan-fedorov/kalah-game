@@ -1,0 +1,4 @@
+bot:
+  telegram:
+    name: "kalah_game_bot"
+    token: ${TELEGRAM_TOKEN}

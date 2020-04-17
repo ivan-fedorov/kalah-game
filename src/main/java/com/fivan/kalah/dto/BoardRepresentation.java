@@ -19,18 +19,18 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 @EqualsAndHashCode
 public class BoardRepresentation {
   private final UUID id;
-  private final UUID playerOne;
-  private final UUID playerTwo;
+  private final Integer playerOne;
+  private final Integer playerTwo;
   private final List<Integer> playerOnePits;
   private final List<Integer> playerTwoPits;
   private final GameStatus gameStatus;
-  private final UUID currentPlayer;
+  private final Integer currentPlayer;
 
   @JsonIgnore
   private final int fieldSize;
 
-  public BoardRepresentation(UUID id, UUID playerOne, UUID playerTwo, Integer[] board,
-                             GameStatus gameStatus, UUID currentPlayer) {
+  public BoardRepresentation(UUID id, Integer playerOne, Integer playerTwo, Integer[] board,
+                             GameStatus gameStatus, Integer currentPlayer) {
     this.id = id;
     this.playerOne = playerOne;
     this.playerTwo = playerTwo;
@@ -46,7 +46,7 @@ public class BoardRepresentation {
     return '\n' + GameUtils.listToString(playerTwoPits) + "\n    " + GameUtils.listToString(playerOnePits);
   }
 
-  public boolean isParticipant(UUID playerId) {
+  public boolean isParticipant(Integer playerId) {
     return playerOne.equals(playerId) || playerTwo.equals(playerId);
   }
 }
