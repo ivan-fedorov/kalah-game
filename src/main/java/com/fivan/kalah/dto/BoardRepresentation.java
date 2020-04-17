@@ -49,4 +49,15 @@ public class BoardRepresentation {
   public boolean isParticipant(Integer playerId) {
     return playerOne.equals(playerId) || playerTwo.equals(playerId);
   }
+
+  public List<Integer> getPlayerPits(Integer playerId) {
+    if (playerId.equals(playerOne)) {
+      return playerOnePits;
+    }
+    if (playerId.equals(playerTwo)) {
+      return playerTwoPits;
+    }
+    throw new IllegalStateException(
+        String.format("Player with id: %s doesn't belong to game: %s", playerId, id));
+  }
 }
