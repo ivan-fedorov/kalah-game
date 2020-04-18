@@ -3,6 +3,8 @@ package com.fivan.kalah.bot.handler;
 import com.fivan.kalah.bot.Event;
 import com.fivan.kalah.bot.HandlingResult;
 import com.fivan.kalah.bot.State;
+import com.fivan.kalah.bot.handler.callback.CallbackDataFactory;
+import com.fivan.kalah.bot.handler.callback.MakeMoveCallbackData;
 import com.fivan.kalah.dto.BoardRepresentation;
 import com.fivan.kalah.entity.Lobby;
 import com.fivan.kalah.entity.Player;
@@ -35,6 +37,7 @@ public class InitialStateHandler implements StateHandler {
   private final PlayerService playerService;
   private final LobbyService lobbyService;
   private final GameService gameService;
+  private final CallbackDataFactory callbackDataFactory;
 
   @Override
   public HandlingResult handle(Update update) {
@@ -95,13 +98,19 @@ public class InitialStateHandler implements StateHandler {
       Integer pit = playerPits.get(i);
       InlineKeyboardButton pitButton = new InlineKeyboardButton()
           .setText(pit.toString())
-          .setCallbackData("makeMove:" + board.getId() + ":" + (pitSize - i));
-
+          .setCallbackData(callbackDataForMove(board.getId(), pitSize));
       currentPlayerRow.addFirst(pitButton);
     }
 
     currentPlayerRow.addFirst(new InlineKeyboardButton().setText("-").setCallbackData("random"));
     return currentPlayerRow;
+  }
+
+  private String callbackDataForMove(UUID boardId, int pitSize) {
+    MakeMoveCallbackData callbackData = MakeMoveCallbackData.builder()
+        .boardId(boardId)
+        .pitId(pitSize - 1).build();
+    return callbackDataFactory.toStringRepresentation(callbackData);
   }
 
   private List<InlineKeyboardButton> fillOpponentPlayerRow(Integer playerId, BoardRepresentation board) {
