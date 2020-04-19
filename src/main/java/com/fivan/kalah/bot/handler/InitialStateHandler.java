@@ -42,7 +42,7 @@ public class InitialStateHandler implements StateHandler {
   @Override
   public HandlingResult handle(Update update) {
 
-    var botApiMethods = new ArrayList<BotApiMethod>();
+    var botApiMethods = new ArrayList<BotApiMethod<?>>();
 
     Integer playerId = GameUtils.getUserIdFromMessage(update);
     if (playerService.getById(playerId).isEmpty()) {

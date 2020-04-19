@@ -22,7 +22,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
   @Override
   public void onUpdateReceived(Update update) {
-    for (BotApiMethod botApiMethod : dispatcherHandler.handle(update)) {
+    for (BotApiMethod<?> botApiMethod : dispatcherHandler.handle(update)) {
       try {
         execute(botApiMethod);
       } catch (Exception e) {

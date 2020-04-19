@@ -12,7 +12,7 @@ import static java.util.Collections.emptyList;
 public interface StateHandler {
 
     HandlingResult handle(Update update);
-    default List<BotApiMethod> getInitialMethods(Update update) {
+    default List<BotApiMethod<?>> getInitialMethods(Update update) {
         return emptyList();
     }
 }

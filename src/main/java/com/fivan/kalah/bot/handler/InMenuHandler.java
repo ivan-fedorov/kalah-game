@@ -39,7 +39,7 @@ public class InMenuHandler implements StateHandler {
 
   @Override
   public HandlingResult handle(Update update) {
-    var botApiMethods = new ArrayList<BotApiMethod>();
+    var botApiMethods = new ArrayList<BotApiMethod<?>>();
     Integer userId = getUserIdFromMessage(update);
     if (update.getMessage().getText().equals(CREATE_NEW)) {
       Lobby lobby = lobbyService.createLobby(new Lobby(UUID.randomUUID(), userId));
@@ -59,7 +59,7 @@ public class InMenuHandler implements StateHandler {
   }
 
   @Override
-  public List<BotApiMethod> getInitialMethods(Update update) {
+  public List<BotApiMethod<?>> getInitialMethods(Update update) {
     Integer userId = getUserIdFromMessage(update);
     KeyboardRow gameRow = new KeyboardRow();
 
