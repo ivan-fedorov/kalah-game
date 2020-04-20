@@ -42,7 +42,7 @@ public class DispatcherHandler {
         ));
   }
 
-  public List<BotApiMethod> handle(Update update) {
+  public List<BotApiMethod<?>> handle(Update update) {
     Integer userId = GameUtils.getUserIdFromMessage(update);
     State playerState = playerStateStorage.get(userId);
 
@@ -73,8 +73,8 @@ public class DispatcherHandler {
 
   }
 
-  private ArrayList<BotApiMethod> addInitialMethodToCurrent(Update update, List<BotApiMethod> methods, State newState) {
-    ArrayList<BotApiMethod> botApiMethods = new ArrayList<>(methods);
+  private ArrayList<BotApiMethod<?>> addInitialMethodToCurrent(Update update, List<BotApiMethod<?>> methods, State newState) {
+    ArrayList<BotApiMethod<?>> botApiMethods = new ArrayList<>(methods);
     botApiMethods.addAll(handlersRoadMap.get(newState).getInitialMethods(update));
     return botApiMethods;
   }

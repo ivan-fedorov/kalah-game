@@ -10,5 +10,5 @@ import java.util.List;
 @Builder
 public class HandlingResult {
   Event event;
-  List<BotApiMethod> methods;
+  List<BotApiMethod<?>> methods;
 }
