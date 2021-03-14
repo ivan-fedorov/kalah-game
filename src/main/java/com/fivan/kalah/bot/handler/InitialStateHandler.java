@@ -12,9 +12,9 @@ import com.fivan.kalah.service.GameService;
 import com.fivan.kalah.service.LobbyService;
 import com.fivan.kalah.service.PlayerService;
 import com.fivan.kalah.util.GameUtils;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@Component
 @Handler(State.INITIAL)
 @RequiredArgsConstructor
 public class InitialStateHandler implements StateHandler {
@@ -64,18 +63,20 @@ public class InitialStateHandler implements StateHandler {
         Integer opponentPlayerId = lobby.getPlayerId();
         BoardRepresentation board = gameService.createGame(opponentPlayerId, playerId);
 
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<InlineKeyboardButton> currentPlayerRow = fillCurrentPlayerRow(playerId, board);
-        List<InlineKeyboardButton> opponentPlayerRow = fillOpponentPlayerRow(lobby.getPlayerId(), board);
+        InlineKeyboardMarkup playerKeyboardMarkup = getPlayerKeyboardMarkup(playerId, lobby, board);
+        InlineKeyboardMarkup opponentKeyboardMarkup = getOpponentKeyboardMarkup(playerId, lobby, board);
 
-        inlineKeyboardMarkup.setKeyboard(List.of(opponentPlayerRow, currentPlayerRow));
-
-        SendMessage sendMessage = new SendMessage()
+        SendMessage sendPlayerMessage = new SendMessage()
             .setText("Opponent move")
             .setChatId(playerId.longValue())
-            .setReplyMarkup(inlineKeyboardMarkup);
+            .setReplyMarkup(playerKeyboardMarkup);
 
-        botApiMethods.add(sendMessage);
+        SendMessage sendOpponentMessage = new SendMessage()
+                .setText("Take turn")
+                .setChatId(opponentPlayerId.longValue())
+                .setReplyMarkup(opponentKeyboardMarkup);
+
+        botApiMethods.addAll(List.of(sendPlayerMessage, sendOpponentMessage));
 
       } catch (IllegalArgumentException e) {
         log.warn("{} is not correct UUID", potentialLobbyId, e);
@@ -88,7 +89,23 @@ public class InitialStateHandler implements StateHandler {
                          .build();
   }
 
-  private List<InlineKeyboardButton> fillCurrentPlayerRow(Integer playerId, BoardRepresentation board) {
+  private InlineKeyboardMarkup getPlayerKeyboardMarkup(Integer playerId, Lobby lobby, BoardRepresentation board) {
+    InlineKeyboardMarkup playerKeyboardMarkup = new InlineKeyboardMarkup();
+    List<InlineKeyboardButton> currentPlayerRow = fillCurrentPlayerRow(playerId, board, false);
+    List<InlineKeyboardButton> opponentPlayerRow = fillOpponentPlayerRow(lobby.getPlayerId(), board, false);
+    playerKeyboardMarkup.setKeyboard(List.of(opponentPlayerRow, currentPlayerRow));
+    return playerKeyboardMarkup;
+  }
+
+  private InlineKeyboardMarkup getOpponentKeyboardMarkup(Integer playerId, Lobby lobby, BoardRepresentation board) {
+    InlineKeyboardMarkup playerKeyboardMarkup = new InlineKeyboardMarkup();
+    List<InlineKeyboardButton> currentPlayerRow = fillCurrentPlayerRow(lobby.getPlayerId(), board, true);
+    List<InlineKeyboardButton> opponentPlayerRow = fillOpponentPlayerRow(playerId, board, true);
+    playerKeyboardMarkup.setKeyboard(List.of(opponentPlayerRow, currentPlayerRow));
+    return playerKeyboardMarkup;
+  }
+
+  private List<InlineKeyboardButton> fillCurrentPlayerRow(Integer playerId, BoardRepresentation board, boolean isPlayerOne) {
     LinkedList<InlineKeyboardButton> currentPlayerRow = new LinkedList<>();
 
     List<Integer> playerPits = board.getPlayerPits(playerId);
@@ -102,6 +119,10 @@ public class InitialStateHandler implements StateHandler {
       currentPlayerRow.addFirst(pitButton);
     }
 
+    if (isPlayerOne) {
+      Collections.reverse(currentPlayerRow);
+    }
+
     currentPlayerRow.addFirst(new InlineKeyboardButton().setText("-").setCallbackData("random"));
     return currentPlayerRow;
   }
@@ -113,7 +134,7 @@ public class InitialStateHandler implements StateHandler {
     return callbackDataFactory.toStringRepresentation(callbackData);
   }
 
-  private List<InlineKeyboardButton> fillOpponentPlayerRow(Integer playerId, BoardRepresentation board) {
+  private List<InlineKeyboardButton> fillOpponentPlayerRow(Integer playerId, BoardRepresentation board, boolean isPlayerOne) {
     LinkedList<InlineKeyboardButton> currentPlayerRow = new LinkedList<>();
 
     List<Integer> playerPits = board.getPlayerPits(playerId);
@@ -124,6 +145,10 @@ public class InitialStateHandler implements StateHandler {
           .setCallbackData("no-op");
 
       currentPlayerRow.addFirst(pitButton);
+    }
+
+    if (isPlayerOne) {
+      Collections.reverse(currentPlayerRow);
     }
 
     currentPlayerRow.add(new InlineKeyboardButton().setText("-").setCallbackData("no-op"));

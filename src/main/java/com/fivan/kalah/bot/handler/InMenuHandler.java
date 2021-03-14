@@ -24,7 +24,6 @@ import java.util.UUID;
 import static com.fivan.kalah.util.GameUtils.getUserIdFromMessage;
 import static java.util.Collections.singletonList;
 
-@Component
 @Handler(State.IN_MENU)
 @RequiredArgsConstructor
 public class InMenuHandler implements StateHandler {

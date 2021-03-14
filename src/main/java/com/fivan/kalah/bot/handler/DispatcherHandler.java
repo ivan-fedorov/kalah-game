@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 public class DispatcherHandler {
 
   private final StateMachineConfiguration<State, Event> stateEventStateMachine;
-  private Map<Integer, State> playerStateStorage = new HashMap<>();
-  private Map<State, StateHandler> handlersRoadMap;
+  private final Map<Integer, State> playerStateStorage = new HashMap<>();
+  private final Map<State, StateHandler> handlersRoadMap;
 
   public DispatcherHandler(List<StateHandler> stateHandlers) {
     stateEventStateMachine = StateMachine.<State, Event>builder()
