@@ -17,22 +17,21 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-
 @Component
 public class DispatcherHandler {
 
+  private final MakeMoveCallbackHandler moveCallbackHandler;
   private final StateMachineConfiguration<State, Event> stateEventStateMachine;
   private final Map<Integer, State> playerStateStorage = new HashMap<>();
   private final Map<State, StateHandler> handlersRoadMap;
 
-  public DispatcherHandler(List<StateHandler> stateHandlers) {
+  public DispatcherHandler(MakeMoveCallbackHandler moveCallbackHandler, List<StateHandler> stateHandlers) {
+    this.moveCallbackHandler = moveCallbackHandler;
     stateEventStateMachine = StateMachine.<State, Event>builder()
         .withStates(State.class)
         .withEvents(Event.class)
         .withInitialState(State.INITIAL)
         .withTransition(State.INITIAL, State.IN_MENU, Event.TO_MENU)
-        .withTransition(State.IN_MENU, State.IN_GAME, Event.TO_GAME)
-        .withTransition(State.IN_GAME, State.IN_MENU, Event.END_GAME)
         .asStateMachineConfiguration();
 
     handlersRoadMap = stateHandlers.stream()
@@ -44,6 +43,11 @@ public class DispatcherHandler {
 
   public List<BotApiMethod<?>> handle(Update update) {
     Integer userId = GameUtils.getUserIdFromMessage(update);
+
+    if (moveCallbackHandler.canProcess(update)) {
+      return moveCallbackHandler.handle(update, userId);
+    }
+
     State playerState = playerStateStorage.get(userId);
 
     //If player state is not present, we just call initial handler and add event to transitionsMap
@@ -70,7 +74,6 @@ public class DispatcherHandler {
     }
 
     return result.getMethods();
-
   }
 
   private ArrayList<BotApiMethod<?>> addInitialMethodToCurrent(Update update, List<BotApiMethod<?>> methods, State newState) {

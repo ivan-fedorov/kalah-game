@@ -60,4 +60,8 @@ public class BoardRepresentation {
     throw new IllegalStateException(
         String.format("Player with id: %s doesn't belong to game: %s", playerId, id));
   }
+
+  public Integer getOpponentId(Integer playerId) {
+    return playerOne.equals(playerId) ? playerTwo : playerOne;
+  }
 }

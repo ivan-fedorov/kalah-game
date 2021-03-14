@@ -1,10 +1,13 @@
 package com.fivan.kalah.util;
 
 import lombok.experimental.UtilityClass;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.joining;
@@ -25,7 +28,10 @@ public class GameUtils {
   }
 
   public static Integer getUserIdFromMessage(Update update) {
-    return update.getMessage().getFrom().getId();
+    return Optional.ofNullable(update.getMessage())
+        .map(Message::getFrom)
+        .map(User::getId)
+        .orElseGet(() -> update.getCallbackQuery().getFrom().getId());
   }
 
 }
