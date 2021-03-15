@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Slf4j
@@ -37,7 +36,7 @@ public class BoardRepresentation {
     this.fieldSize = board.length / 2;
     this.playerOnePits = Arrays.stream(board, 0, fieldSize)
         .collect(toUnmodifiableList());
-    this.playerTwoPits = unmodifiableList(GameUtils.playerTwoList(board, fieldSize));
+    this.playerTwoPits = GameUtils.playerTwoList(board, fieldSize);
     this.gameStatus = gameStatus;
     this.currentPlayer = currentPlayer;
   }
@@ -59,9 +58,5 @@ public class BoardRepresentation {
     }
     throw new IllegalStateException(
         String.format("Player with id: %s doesn't belong to game: %s", playerId, id));
-  }
-
-  public Integer getOpponentId(Integer playerId) {
-    return playerOne.equals(playerId) ? playerTwo : playerOne;
   }
 }

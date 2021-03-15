@@ -4,8 +4,6 @@ import com.fivan.kalah.bot.Event;
 import com.fivan.kalah.bot.HandlingResult;
 import com.fivan.kalah.bot.KeyboardService;
 import com.fivan.kalah.bot.State;
-import com.fivan.kalah.bot.handler.callback.CallbackDataFactory;
-import com.fivan.kalah.bot.handler.callback.MakeMoveCallbackData;
 import com.fivan.kalah.dto.BoardRepresentation;
 import com.fivan.kalah.entity.Lobby;
 import com.fivan.kalah.entity.Player;
@@ -13,19 +11,13 @@ import com.fivan.kalah.service.GameService;
 import com.fivan.kalah.service.LobbyService;
 import com.fivan.kalah.service.PlayerService;
 import com.fivan.kalah.util.GameUtils;
-
-import java.util.Collections;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,8 +58,17 @@ public class InitialStateHandler implements StateHandler {
         Integer opponentPlayerId = lobby.getPlayerId();
         BoardRepresentation board = gameService.createGame(opponentPlayerId, playerId);
 
-        botApiMethods.addAll(keyboardService.prepareMessages(playerId, opponentPlayerId, board));
+        SendMessage sendPlayerOneMessage = new SendMessage()
+            .setText("Your turn")
+            .setChatId(board.getPlayerOne().longValue())
+            .setReplyMarkup(keyboardService.preparePlayerOneButtons(board));
 
+        SendMessage sendPlayerTwoMessage = new SendMessage()
+            .setText("Opponents turn")
+            .setChatId(board.getPlayerTwo().longValue())
+            .setReplyMarkup(keyboardService.preparePlayerTwoButtons(board));
+
+        botApiMethods.addAll(List.of(sendPlayerOneMessage, sendPlayerTwoMessage));
       } catch (IllegalArgumentException e) {
         log.warn("{} is not correct UUID", potentialLobbyId, e);
       }
@@ -78,6 +79,4 @@ public class InitialStateHandler implements StateHandler {
         .methods(botApiMethods)
         .build();
   }
-
-
 }

@@ -3,10 +3,8 @@ package com.fivan.kalah.bot;
 import com.fivan.kalah.bot.handler.callback.CallbackDataFactory;
 import com.fivan.kalah.bot.handler.callback.MakeMoveCallbackData;
 import com.fivan.kalah.dto.BoardRepresentation;
-import com.fivan.kalah.entity.Lobby;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
@@ -19,60 +17,68 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class KeyboardService {
 
+  private static final String NON_OPERATIONAL = "no-op";
   private final CallbackDataFactory callbackDataFactory;
 
-  public List<SendMessage> prepareMessages(Integer playerId, Integer opponentPlayerId, BoardRepresentation board) {
-    InlineKeyboardMarkup playerKeyboardMarkup = getPlayerKeyboardMarkup(playerId, opponentPlayerId, board);
-    InlineKeyboardMarkup opponentKeyboardMarkup = getOpponentKeyboardMarkup(playerId, opponentPlayerId, board);
+  public InlineKeyboardMarkup preparePlayerOneButtons(BoardRepresentation board) {
+    List<InlineKeyboardButton> playerOneRow = fillPlayerOneRow(board.getPlayerOne(), board, false);
+    List<InlineKeyboardButton> playerTwoRow = fillPlayerTwoRow(board.getPlayerTwo(), board, false);
 
-    SendMessage sendPlayerMessage = new SendMessage()
-        .setText("Opponent move")
-        .setChatId(playerId.longValue())
-        .setReplyMarkup(playerKeyboardMarkup);
-
-    SendMessage sendOpponentMessage = new SendMessage()
-        .setText("Take turn")
-        .setChatId(opponentPlayerId.longValue())
-        .setReplyMarkup(opponentKeyboardMarkup);
-    return List.of(sendPlayerMessage, sendOpponentMessage);
+    InlineKeyboardMarkup playerOneKeyboardMarkup = new InlineKeyboardMarkup();
+    playerOneKeyboardMarkup.setKeyboard(List.of(playerTwoRow, playerOneRow));
+    return playerOneKeyboardMarkup;
   }
 
-  private InlineKeyboardMarkup getPlayerKeyboardMarkup(Integer playerId, Integer opponentPlayerId, BoardRepresentation board) {
-    InlineKeyboardMarkup playerKeyboardMarkup = new InlineKeyboardMarkup();
-    List<InlineKeyboardButton> currentPlayerRow = fillCurrentPlayerRow(playerId, board, false);
-    List<InlineKeyboardButton> opponentPlayerRow = fillOpponentPlayerRow(opponentPlayerId, board, false);
-    playerKeyboardMarkup.setKeyboard(List.of(opponentPlayerRow, currentPlayerRow));
-    return playerKeyboardMarkup;
+  public InlineKeyboardMarkup preparePlayerTwoButtons(BoardRepresentation board) {
+    List<InlineKeyboardButton> playerTwoRow = fillPlayerTwoRow(board.getPlayerTwo(), board, true);
+    List<InlineKeyboardButton> playerOneRow = fillPlayerOneRow(board.getPlayerOne(), board, true);
+
+    InlineKeyboardMarkup playerOneKeyboardMarkup = new InlineKeyboardMarkup();
+    playerOneKeyboardMarkup.setKeyboard(List.of(playerOneRow, playerTwoRow));
+    return playerOneKeyboardMarkup;
   }
 
-  private InlineKeyboardMarkup getOpponentKeyboardMarkup(Integer playerId, Integer opponentPlayerId, BoardRepresentation board) {
-    InlineKeyboardMarkup playerKeyboardMarkup = new InlineKeyboardMarkup();
-    List<InlineKeyboardButton> currentPlayerRow = fillCurrentPlayerRow(opponentPlayerId, board, true);
-    List<InlineKeyboardButton> opponentPlayerRow = fillOpponentPlayerRow(playerId, board, true);
-    playerKeyboardMarkup.setKeyboard(List.of(opponentPlayerRow, currentPlayerRow));
-    return playerKeyboardMarkup;
-  }
+  private List<InlineKeyboardButton> fillPlayerOneRow(Integer playerId, BoardRepresentation board, boolean isPlayerTwo) {
+    LinkedList<InlineKeyboardButton> playerOneRow = new LinkedList<>();
 
-  private List<InlineKeyboardButton> fillCurrentPlayerRow(Integer playerId, BoardRepresentation board, boolean isPlayerOne) {
-    LinkedList<InlineKeyboardButton> currentPlayerRow = new LinkedList<>();
+    List<Integer> playerOnePits = board.getPlayerPits(playerId);
 
-    List<Integer> playerPits = board.getPlayerPits(playerId);
-
-    int pitSize = playerPits.size() - 1;
-    for (int i = 0; i <= pitSize; i++) {
-      Integer pit = playerPits.get(i);
+    for (int i = 0; i < playerOnePits.size(); i++) {
+      Integer pit = playerOnePits.get(i);
       InlineKeyboardButton pitButton = new InlineKeyboardButton()
           .setText(pit.toString())
-          .setCallbackData(callbackDataForMove(board.getId(), i));
-      currentPlayerRow.addFirst(pitButton);
+          .setCallbackData(isPlayerTwo ? NON_OPERATIONAL : callbackDataForMove(board.getId(), i));
+      playerOneRow.add(pitButton);
+    }
+    playerOneRow.addFirst(new InlineKeyboardButton().setText("-").setCallbackData(NON_OPERATIONAL));
+
+    if (isPlayerTwo) {
+      Collections.reverse(playerOneRow);
     }
 
-    if (isPlayerOne) {
-      Collections.reverse(currentPlayerRow);
+    return playerOneRow;
+  }
+
+  private List<InlineKeyboardButton> fillPlayerTwoRow(Integer playerId, BoardRepresentation board, boolean isPlayerTwo) {
+    LinkedList<InlineKeyboardButton> playerTwoRow = new LinkedList<>();
+
+    List<Integer> playerTwoPits = board.getPlayerPits(playerId);
+
+    int pitSize = playerTwoPits.size() - 1;
+    for (int i = 0; i <= pitSize; i++) {
+      Integer pit = playerTwoPits.get(i);
+      InlineKeyboardButton pitButton = new InlineKeyboardButton()
+          .setText(pit.toString())
+          .setCallbackData(isPlayerTwo ? callbackDataForMove(board.getId(), pitSize - i) : NON_OPERATIONAL);
+      playerTwoRow.addFirst(pitButton);
+    }
+    playerTwoRow.addFirst(new InlineKeyboardButton().setText("-").setCallbackData(NON_OPERATIONAL));
+
+    if (!isPlayerTwo) {
+      Collections.reverse(playerTwoRow);
     }
 
-    currentPlayerRow.addFirst(new InlineKeyboardButton().setText("-").setCallbackData("random"));
-    return currentPlayerRow;
+    return playerTwoRow;
   }
 
   private String callbackDataForMove(UUID boardId, int pitId) {
@@ -81,27 +87,5 @@ public class KeyboardService {
         .pitId(pitId)
         .build();
     return callbackDataFactory.toStringRepresentation(callbackData);
-  }
-
-  private List<InlineKeyboardButton> fillOpponentPlayerRow(Integer playerId, BoardRepresentation board, boolean isPlayerOne) {
-    LinkedList<InlineKeyboardButton> currentPlayerRow = new LinkedList<>();
-
-    List<Integer> playerPits = board.getPlayerPits(playerId);
-
-    for (Integer pit : playerPits) {
-      InlineKeyboardButton pitButton = new InlineKeyboardButton()
-          .setText(pit.toString())
-          .setCallbackData("no-op");
-
-      currentPlayerRow.addFirst(pitButton);
-    }
-
-    if (isPlayerOne) {
-      Collections.reverse(currentPlayerRow);
-    }
-
-    currentPlayerRow.add(new InlineKeyboardButton().setText("-").setCallbackData("no-op"));
-
-    return currentPlayerRow;
   }
 }
