@@ -41,7 +41,10 @@ public class InMenuHandler implements StateHandler {
     var botApiMethods = new ArrayList<BotApiMethod<?>>();
     Integer userId = getUserIdFromMessage(update);
     if (update.getMessage().getText().equals(CREATE_NEW)) {
-      Lobby lobby = lobbyService.createLobby(new Lobby(UUID.randomUUID(), userId));
+      Lobby lobby = lobbyService.createLobby(Lobby.builder()
+          .id(UUID.randomUUID())
+          .playerId(userId)
+          .build());
       UUID lobbyId = lobby.getId();
 
       botApiMethods.add(new SendMessage()

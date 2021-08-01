@@ -1,5 +1,6 @@
 package com.fivan.kalah.bot;
 
+import com.fivan.kalah.bot.handler.ActionsAndMethods;
 import com.fivan.kalah.bot.handler.DispatcherHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +23,19 @@ public class TelegramBot extends TelegramLongPollingBot {
 
   @Override
   public void onUpdateReceived(Update update) {
-    for (BotApiMethod<?> botApiMethod : dispatcherHandler.handle(update)) {
+    ActionsAndMethods actionsAndMethods = dispatcherHandler.handle(update);
+    for (BotApiMethod<?> botApiMethod : actionsAndMethods.getMethods()) {
       try {
         execute(botApiMethod);
       } catch (Exception e) {
         log.warn("Something went wrong with Telegram API for method: {}", botApiMethod.getMethod(), e);
+      }
+    }
+    for (LobbySendMessageAction action : actionsAndMethods.getActions()) {
+      try {
+        action.execute(this);
+      } catch (Exception e) {
+        log.warn("Something went wrong with Telegram API for action: {}", action, e);
       }
     }
   }

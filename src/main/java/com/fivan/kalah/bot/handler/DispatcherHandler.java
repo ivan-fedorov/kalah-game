@@ -41,11 +41,13 @@ public class DispatcherHandler {
         ));
   }
 
-  public List<BotApiMethod<?>> handle(Update update) {
+  public ActionsAndMethods handle(Update update) {
     Integer userId = GameUtils.getUserIdFromMessage(update);
 
     if (moveCallbackHandler.canProcess(update)) {
-      return moveCallbackHandler.handle(update, userId);
+      return ActionsAndMethods.builder()
+          .methods(moveCallbackHandler.handle(update, userId))
+          .build();
     }
 
     State playerState = playerStateStorage.get(userId);
@@ -59,7 +61,10 @@ public class DispatcherHandler {
 
       playerStateStorage.put(userId, currentState);
 
-      return addInitialMethodToCurrent(update, result.getMethods(), currentState);
+      return ActionsAndMethods.builder()
+          .methods(addInitialMethodToCurrent(update, result.getMethods(), currentState))
+          .actions(result.getActions())
+          .build();
     }
 
     HandlingResult result = handlersRoadMap.get(playerState).handle(update);
@@ -70,10 +75,16 @@ public class DispatcherHandler {
     playerStateStorage.put(userId, newState);
 
     if (!playerState.equals(newState)) {
-      return addInitialMethodToCurrent(update, result.getMethods(), newState);
+      return ActionsAndMethods.builder()
+          .actions(result.getActions())
+          .methods(addInitialMethodToCurrent(update, result.getMethods(), newState))
+          .build();
     }
 
-    return result.getMethods();
+    return ActionsAndMethods.builder()
+        .actions(result.getActions())
+        .methods(result.getMethods())
+        .build();
   }
 
   private ArrayList<BotApiMethod<?>> addInitialMethodToCurrent(Update update, List<BotApiMethod<?>> methods, State newState) {

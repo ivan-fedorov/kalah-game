@@ -8,8 +8,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class BoardTest {
 
-  private static final Player FIRST_PLAYER = new Player(UUID.randomUUID(), "John");
-  private static final Player SECOND_PLAYER = new Player(UUID.randomUUID(), "Paul");
+  private static final Player FIRST_PLAYER = new Player(1, "John");
+  private static final Player SECOND_PLAYER = new Player(2, "Paul");
   private Board board;
 
   @Test

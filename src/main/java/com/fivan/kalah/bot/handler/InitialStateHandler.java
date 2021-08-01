@@ -1,9 +1,6 @@
 package com.fivan.kalah.bot.handler;
 
-import com.fivan.kalah.bot.Event;
-import com.fivan.kalah.bot.HandlingResult;
-import com.fivan.kalah.bot.KeyboardService;
-import com.fivan.kalah.bot.State;
+import com.fivan.kalah.bot.*;
 import com.fivan.kalah.dto.BoardRepresentation;
 import com.fivan.kalah.entity.Lobby;
 import com.fivan.kalah.entity.Player;
@@ -37,6 +34,7 @@ public class InitialStateHandler implements StateHandler {
   public HandlingResult handle(Update update) {
 
     var botApiMethods = new ArrayList<BotApiMethod<?>>();
+    var actions = new ArrayList<LobbySendMessageAction>();
 
     Integer playerId = GameUtils.getUserIdFromMessage(update);
     if (playerService.getById(playerId).isEmpty()) {
@@ -57,18 +55,26 @@ public class InitialStateHandler implements StateHandler {
         Lobby lobby = lobbyService.getById(lobbyId).orElseThrow();
         Integer opponentPlayerId = lobby.getPlayerId();
         BoardRepresentation board = gameService.createGame(opponentPlayerId, playerId);
+        lobbyService.addBoardId(lobbyId, board.getId());
 
         SendMessage sendPlayerOneMessage = new SendMessage()
             .setText("Your turn")
             .setChatId(board.getPlayerOne().longValue())
             .setReplyMarkup(keyboardService.preparePlayerOneButtons(board));
 
-        SendMessage sendPlayerTwoMessage = new SendMessage()
-            .setText("Opponents turn")
-            .setChatId(board.getPlayerTwo().longValue())
-            .setReplyMarkup(keyboardService.preparePlayerTwoButtons(board));
+        SendMessage sendPlayerTwoMessage =
+            new SendMessage()
+                .setText("Opponents turn")
+                .setChatId(board.getPlayerTwo().longValue())
+                .setReplyMarkup(keyboardService.preparePlayerTwoButtons(board));
 
-        botApiMethods.addAll(List.of(sendPlayerOneMessage, sendPlayerTwoMessage));
+        LobbySendMessageAction playerOneAction = new LobbySendMessageAction(sendPlayerOneMessage, message ->
+            lobbyService.addPlayerOneMessageId(lobbyId, message.getMessageId())
+        );
+        LobbySendMessageAction playerTwoAction = new LobbySendMessageAction(sendPlayerTwoMessage, message ->
+            lobbyService.addPlayerTwoMessageId(lobbyId, message.getMessageId())
+        );
+        actions.addAll(List.of(playerOneAction, playerTwoAction));
       } catch (IllegalArgumentException e) {
         log.warn("{} is not correct UUID", potentialLobbyId, e);
       }
@@ -77,6 +83,7 @@ public class InitialStateHandler implements StateHandler {
     return HandlingResult.builder()
         .event(Event.TO_MENU)
         .methods(botApiMethods)
+        .actions(actions)
         .build();
   }
 }
