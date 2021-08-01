@@ -1,6 +1,7 @@
 package com.fivan.kalah.entity;
 
 import com.fivan.kalah.dto.BoardRepresentation;
+import com.fivan.kalah.exception.MakeMoveInFinishedGameException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +81,7 @@ public class Board {
 
   public BoardRepresentation makeMove(int pitIndex, Integer playerId) {
     if (!gameStatus.equals(InProgress)) {
-      throw new IllegalStateException("Game has been ended with status: " + gameStatus);
+      throw new MakeMoveInFinishedGameException("Game has been ended with status: " + gameStatus);
     }
 
     if (!playerId.equals(currentPlayer)) {
