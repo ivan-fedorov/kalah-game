@@ -1,0 +1,13 @@
+bot:
+  telegram:
+    name: "kalah_game_bot"
+    token: ${TELEGRAM_TOKEN}
+
+spring:
+  data:
+    mongodb:
+      username: ${MONGO_USER}
+      password: ${MONGO_PASS}
+      database: kalah
+      host: localhost
+      authentication-database: admin

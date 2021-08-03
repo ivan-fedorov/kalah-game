@@ -12,10 +12,10 @@ import static com.fivan.kalah.entity.GameStatus.InProgress;
 
 public class ConsoleRunner {
 
-  private static final Player FIRST_PLAYER = new Player(UUID.randomUUID(), "Paul");
-  private static final Player SECOND_PLAYER = new Player(UUID.randomUUID(), "John");
+  private static final Player FIRST_PLAYER = new Player(1, "Paul");
+  private static final Player SECOND_PLAYER = new Player(2, "John");
 
-  private static final Map<UUID, Player> PLAYER_BY_ID = Map.of(FIRST_PLAYER.getId(), FIRST_PLAYER,
+  private static final Map<Integer, Player> PLAYER_BY_ID = Map.of(FIRST_PLAYER.getId(), FIRST_PLAYER,
       SECOND_PLAYER.getId(), SECOND_PLAYER);
 
   public static void main(String[] args) {
