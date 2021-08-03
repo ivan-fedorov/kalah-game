@@ -1,0 +1,19 @@
+version: "2.4"
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10M
+        max-file: "3"
+    environment:
+      - "MONGO_LOG_DIR=/dev/null"
+      - "MONGO_INITDB_ROOT_USERNAME=$MONGO_USER"
+      - "MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASS"
+    command: --auth
+    volumes:
+      - "./mongodb/:/data/db"

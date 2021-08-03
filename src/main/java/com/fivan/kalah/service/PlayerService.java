@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -15,17 +14,17 @@ public class PlayerService {
 
   private final PlayerRepository repository;
 
-  public Player save(String name) {
-    return repository.save(name);
+  public Player save(Player player) {
+    return repository.save(player);
   }
 
-  public Player getById(UUID id) {
-    return repository.getById(id).orElseThrow();
+  public Optional<Player> getById(Integer id) {
+    return repository.findById(id);
   }
 
-  public boolean playersExistsById(List<UUID> players) {
+  public boolean playersExistsById(List<Integer> players) {
     return players.stream()
-        .map(repository::getById)
+        .map(repository::findById)
         .allMatch(Optional::isPresent);
   }
 }
