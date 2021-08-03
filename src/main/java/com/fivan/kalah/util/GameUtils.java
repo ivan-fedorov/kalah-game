@@ -33,5 +33,4 @@ public class GameUtils {
         .map(User::getId)
         .orElseGet(() -> update.getCallbackQuery().getFrom().getId());
   }
-
 }

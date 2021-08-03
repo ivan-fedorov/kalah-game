@@ -3,9 +3,11 @@ package com.fivan.kalah.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fivan.kalah.entity.GameStatus;
 import com.fivan.kalah.util.GameUtils;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.Id;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +18,9 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 @Slf4j
 @Getter
 @EqualsAndHashCode
+@AllArgsConstructor
 public class BoardRepresentation {
+  @Id
   private final UUID id;
   private final Integer playerOne;
   private final Integer playerTwo;
@@ -28,17 +32,11 @@ public class BoardRepresentation {
   @JsonIgnore
   private final int fieldSize;
 
-  public BoardRepresentation(UUID id, Integer playerOne, Integer playerTwo, Integer[] board,
-                             GameStatus gameStatus, Integer currentPlayer) {
-    this.id = id;
-    this.playerOne = playerOne;
-    this.playerTwo = playerTwo;
-    this.fieldSize = board.length / 2;
-    this.playerOnePits = Arrays.stream(board, 0, fieldSize)
-        .collect(toUnmodifiableList());
-    this.playerTwoPits = GameUtils.playerTwoList(board, fieldSize);
-    this.gameStatus = gameStatus;
-    this.currentPlayer = currentPlayer;
+  public static BoardRepresentation boardRepresentation(UUID id, Integer playerOne, Integer playerTwo, Integer[] board,
+                                                        GameStatus gameStatus, Integer currentPlayer) {
+    int fieldSize = board.length / 2;
+    return new BoardRepresentation(id, playerOne, playerTwo, Arrays.stream(board, 0, fieldSize)
+        .collect(toUnmodifiableList()), GameUtils.playerTwoList(board, fieldSize), gameStatus, currentPlayer, fieldSize);
   }
 
   public String toString() {

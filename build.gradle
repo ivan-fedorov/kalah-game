@@ -24,6 +24,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.telegram:telegrambots-spring-boot-starter:4.1.2'
 
 	implementation 'ru.romangr:simple-state-machine:0.0.3'

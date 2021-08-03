@@ -11,5 +11,4 @@ public class KalahApplication {
     ApiContextInitializer.init();
     SpringApplication.run(KalahApplication.class, args);
   }
-
 }

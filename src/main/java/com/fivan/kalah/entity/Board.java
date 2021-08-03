@@ -6,18 +6,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import static com.fivan.kalah.dto.BoardRepresentation.boardRepresentation;
 import static com.fivan.kalah.entity.Board.PlayerRole.PLAYER_ONE;
 import static com.fivan.kalah.entity.Board.PlayerRole.PLAYER_TWO;
-import static com.fivan.kalah.entity.GameStatus.Draw;
-import static com.fivan.kalah.entity.GameStatus.InProgress;
-import static com.fivan.kalah.entity.GameStatus.PlayerOneWins;
-import static com.fivan.kalah.entity.GameStatus.PlayerTwoWins;
+import static com.fivan.kalah.entity.GameStatus.*;
 import static com.fivan.kalah.util.GameUtils.listToString;
 import static com.fivan.kalah.util.GameUtils.playerTwoList;
 import static java.util.Arrays.asList;
@@ -98,7 +92,7 @@ public class Board {
   }
 
   public BoardRepresentation toRepresentation() {
-    return new BoardRepresentation(id, idByRole.get(PLAYER_ONE), idByRole.get(PLAYER_TWO),
+    return boardRepresentation(id, idByRole.get(PLAYER_ONE), idByRole.get(PLAYER_TWO),
         board, gameStatus, currentPlayer);
   }
 
