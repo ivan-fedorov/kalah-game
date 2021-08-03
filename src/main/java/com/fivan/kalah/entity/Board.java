@@ -1,22 +1,17 @@
 package com.fivan.kalah.entity;
 
 import com.fivan.kalah.dto.BoardRepresentation;
+import com.fivan.kalah.exception.MakeMoveInFinishedGameException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import static com.fivan.kalah.dto.BoardRepresentation.boardRepresentation;
 import static com.fivan.kalah.entity.Board.PlayerRole.PLAYER_ONE;
 import static com.fivan.kalah.entity.Board.PlayerRole.PLAYER_TWO;
-import static com.fivan.kalah.entity.GameStatus.Draw;
-import static com.fivan.kalah.entity.GameStatus.InProgress;
-import static com.fivan.kalah.entity.GameStatus.PlayerOneWins;
-import static com.fivan.kalah.entity.GameStatus.PlayerTwoWins;
+import static com.fivan.kalah.entity.GameStatus.*;
 import static com.fivan.kalah.util.GameUtils.listToString;
 import static com.fivan.kalah.util.GameUtils.playerTwoList;
 import static java.util.Arrays.asList;
@@ -29,22 +24,22 @@ public class Board {
 
   private final UUID id;
   private final Integer[] board;
-  private final Map<UUID, PlayerRole> roleById;
-  private final Map<PlayerRole, UUID> idByRole;
+  private final Map<Integer, PlayerRole> roleById;
+  private final Map<PlayerRole, Integer> idByRole;
   private final int fieldSize;
   private final int lastPitIndex;
-  private UUID currentPlayer;
+  private Integer currentPlayer;
   private GameStatus gameStatus;
 
   /**
    * Creates play board.
    *
-   * @param player1     {@link UUID} of first {@link Player}.
-   * @param player2     {@link UUID} of second {@link Player}.
+   * @param player1     {@link Integer} of first {@link Player}.
+   * @param player2     {@link Integer} of second {@link Player}.
    * @param fieldSize   number of pits (including big) for one player.
    * @param stonesInPit number of stones in one pit.
    */
-  public Board(UUID player1, UUID player2, int fieldSize, int stonesInPit) {
+  public Board(Integer player1, Integer player2, int fieldSize, int stonesInPit) {
     this.id = UUID.randomUUID();
     this.fieldSize = fieldSize;
     this.lastPitIndex = fieldSize - 1;
@@ -56,8 +51,8 @@ public class Board {
     logBoardState();
   }
 
-  private Board(UUID id, Integer[] board, UUID player1, UUID player2,
-                int fieldSize, UUID currentPlayer, GameStatus gameStatus) {
+  private Board(UUID id, Integer[] board, Integer player1, Integer player2,
+                int fieldSize, Integer currentPlayer, GameStatus gameStatus) {
     this.id = id;
     this.board = board;
     this.roleById = Map.of(player1, PLAYER_ONE, player2, PLAYER_TWO);
@@ -78,9 +73,9 @@ public class Board {
         br.getFieldSize(), br.getCurrentPlayer(), br.getGameStatus());
   }
 
-  public BoardRepresentation makeMove(int pitIndex, UUID playerId) {
+  public BoardRepresentation makeMove(int pitIndex, Integer playerId) {
     if (!gameStatus.equals(InProgress)) {
-      throw new IllegalStateException("Game has been ended with status: " + gameStatus);
+      throw new MakeMoveInFinishedGameException("Game has been ended with status: " + gameStatus);
     }
 
     if (!playerId.equals(currentPlayer)) {
@@ -97,7 +92,7 @@ public class Board {
   }
 
   public BoardRepresentation toRepresentation() {
-    return new BoardRepresentation(id, idByRole.get(PLAYER_ONE), idByRole.get(PLAYER_TWO),
+    return boardRepresentation(id, idByRole.get(PLAYER_ONE), idByRole.get(PLAYER_TWO),
         board, gameStatus, currentPlayer);
   }
 
@@ -123,6 +118,7 @@ public class Board {
         currentPit %= fieldSize * 2;
       }
     }
+
     if (currentPit < getBigPit(playerRole) && fieldSize * (playerRole.getPlayerIndex() - 1) <= currentPit) {
       if (board[currentPit] == 1) {
         board[getBigPit(playerRole)] += board[lastPitIndex * 2 - currentPit] + 1;
@@ -163,7 +159,7 @@ public class Board {
     return playerRole.getPlayerIndex() * fieldSize - 1;
   }
 
-  private PlayerRole getOtherPlayer(UUID playerId) {
+  private PlayerRole getOtherPlayer(Integer playerId) {
     return getOtherPlayer(roleById.get(playerId));
   }
 
