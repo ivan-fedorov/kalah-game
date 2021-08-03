@@ -52,7 +52,7 @@ public class InitialStateHandler implements StateHandler {
       String potentialLobbyId = splitMessage[1];
       try {
         UUID lobbyId = UUID.fromString(potentialLobbyId);
-        Lobby lobby = lobbyService.getById(lobbyId).orElseThrow();
+        Lobby lobby = lobbyService.findById(lobbyId).orElseThrow();
         Integer opponentPlayerId = lobby.getPlayerId();
         BoardRepresentation board = gameService.createGame(opponentPlayerId, playerId);
         lobbyService.addBoardId(lobbyId, board.getId());

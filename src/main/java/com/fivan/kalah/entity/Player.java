@@ -1,6 +1,7 @@
 package com.fivan.kalah.entity;
 
 import lombok.Value;
+import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -8,7 +9,7 @@ import javax.validation.constraints.NotNull;
 @Value
 public class Player {
 
-  @NotNull
+  @Id
   Integer id;
 
   @NotBlank
