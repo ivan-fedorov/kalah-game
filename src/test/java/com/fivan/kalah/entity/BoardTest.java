@@ -1,15 +1,14 @@
 package com.fivan.kalah.entity;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
-
+import static com.fivan.kalah.entity.Player.player;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 class BoardTest {
 
-  private static final Player FIRST_PLAYER = new Player(1, "John");
-  private static final Player SECOND_PLAYER = new Player(2, "Paul");
+  private static final Player FIRST_PLAYER = player(1, "John");
+  private static final Player SECOND_PLAYER = player(2, "Paul");
   private Board board;
 
   @Test

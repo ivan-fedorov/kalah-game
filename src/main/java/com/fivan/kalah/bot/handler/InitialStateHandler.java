@@ -39,7 +39,7 @@ public class InitialStateHandler implements StateHandler {
     Integer playerId = GameUtils.getUserIdFromMessage(update);
     if (playerService.getById(playerId).isEmpty()) {
       String userName = update.getMessage().getFrom().getUserName();
-      Player newPlayer = new Player(playerId, userName);
+      Player newPlayer = new Player(playerId, userName, 1000, 1);
       playerService.save(newPlayer);
       botApiMethods.add(new SendMessage()
           .setText(String.format("Hello %s, welcome to Kalah game!", userName))
