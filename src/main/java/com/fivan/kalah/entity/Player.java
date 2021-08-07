@@ -27,6 +27,6 @@ public class Player {
   Integer version;
 
   public static Player player(Integer id, String name) {
-    return new Player(id, name, 1000, 1);
+    return new Player(id, name, 1000, null);
   }
 }
