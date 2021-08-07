@@ -19,10 +19,10 @@ public class RatingCalculator {
     }
 
     if (status == GameStatus.Draw) {
-      return drawCalculation(playerOneRating, playerTwoRating);
+      return calculateDrawRatings(playerOneRating, playerTwoRating);
     }
 
-    WinnerLoserRating ratings = winnerLoserRating(status, playerOneRating, playerTwoRating);
+    WinnerLoserRating ratings = resolveWinnerLoserRatings(status, playerOneRating, playerTwoRating);
     if (ratings.getWinnerRating() - ratings.getLoserRating() > 100) {
       return RatingCalculation.builder()
           .playerOneRating(playerOneRating)
@@ -30,11 +30,11 @@ public class RatingCalculator {
           .build();
     }
 
-    return winLoseCalculation(status, ratings.getWinnerRating(), ratings.getLoserRating(),
-        this::winLoseDeltaCalculation);
+    return calculateWinLoseRatings(status, ratings.getWinnerRating(), ratings.getLoserRating(),
+        this::calculateWinLoseRatingDelta);
   }
 
-  private RatingCalculation winLoseCalculation(GameStatus status, int winnerRating,
+  private RatingCalculation calculateWinLoseRatings(GameStatus status, int winnerRating,
       int loserRating, BinaryOperator<Integer> deltaCalculator) {
     int delta = deltaCalculator.apply(winnerRating, loserRating);
     int potentialLoserRating = loserRating - delta;
@@ -47,7 +47,7 @@ public class RatingCalculator {
         .build();
   }
 
-  private RatingCalculation drawCalculation(int playerOneRating, int playerTwoRating) {
+  private RatingCalculation calculateDrawRatings(int playerOneRating, int playerTwoRating) {
     int initialGap = Math.abs(playerOneRating - playerTwoRating);
     if (initialGap <= 100) {
       return RatingCalculation.builder()
@@ -60,19 +60,19 @@ public class RatingCalculator {
     GameStatus pseudoStatus =
         playerOneRating > playerTwoRating ? GameStatus.PlayerTwoWins : GameStatus.PlayerOneWins;
 
-    WinnerLoserRating ratings = winnerLoserRating(pseudoStatus, playerOneRating, playerTwoRating);
-    return winLoseCalculation(pseudoStatus, ratings.getWinnerRating(), ratings.getLoserRating(),
-        (winnerRating, loserRating) -> winLoseDeltaCalculation(winnerRating, loserRating) / 3);
+    WinnerLoserRating ratings = resolveWinnerLoserRatings(pseudoStatus, playerOneRating, playerTwoRating);
+    return calculateWinLoseRatings(pseudoStatus, ratings.getWinnerRating(), ratings.getLoserRating(),
+        (winnerRating, loserRating) -> calculateWinLoseRatingDelta(winnerRating, loserRating) / 3);
   }
 
-  private WinnerLoserRating winnerLoserRating(GameStatus status, int playerOneRating,
+  private WinnerLoserRating resolveWinnerLoserRatings(GameStatus status, int playerOneRating,
       int playerTwoRating) {
     int winnerRating = status == GameStatus.PlayerOneWins ? playerOneRating : playerTwoRating;
     int loserRating = status == GameStatus.PlayerTwoWins ? playerOneRating : playerTwoRating;
     return new WinnerLoserRating(winnerRating, loserRating);
   }
 
-  private int winLoseDeltaCalculation(int winnerRating, int loserRating) {
+  private int calculateWinLoseRatingDelta(int winnerRating, int loserRating) {
     return 100 - (winnerRating - loserRating) / 10;
   }
 
