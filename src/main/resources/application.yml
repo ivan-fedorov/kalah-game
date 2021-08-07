@@ -9,5 +9,5 @@ spring:
       username: ${MONGO_USER}
       password: ${MONGO_PASS}
       database: kalah
-      host: localhost
+      host: mongodb
       authentication-database: admin
