@@ -1,12 +1,16 @@
 package com.fivan.kalah.entity;
 
-import lombok.Value;
-import org.springframework.data.annotation.Id;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
+import lombok.With;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 
 @Value
+@Builder
+@AllArgsConstructor
 public class Player {
 
   @Id
@@ -14,4 +18,15 @@ public class Player {
 
   @NotBlank
   String name;
+
+  @With
+  Integer rating;
+
+  @With
+  @Version
+  Integer version;
+
+  public static Player player(Integer id, String name) {
+    return new Player(id, name, 1000, 1);
+  }
 }
