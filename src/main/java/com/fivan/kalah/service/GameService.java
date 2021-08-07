@@ -42,7 +42,7 @@ public class GameService {
       this.ratingService.updateRating(
           boardRepresentation.getPlayerOne(),
           boardRepresentation.getPlayerTwo(),
-          boardRepresentation.getGameStatus()
+          afterMove.getGameStatus()
       );
     }
     return repository.save(afterMove);
