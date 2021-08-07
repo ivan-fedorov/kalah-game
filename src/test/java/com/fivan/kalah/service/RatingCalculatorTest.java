@@ -28,11 +28,19 @@ public class RatingCalculatorTest {
   }
 
   @Test
-  void ratingIsNotChangedWhenGameStatusIsDraw() {
+  void ratingIsNotChangedWhenGameStatusIsDrawAndInitialRatingGapIsHundredOrLess() {
     RatingCalculation calculation = ratingCalculator.calculate(1000, 1000, GameStatus.Draw);
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1000);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1000);
+  }
+
+  @Test
+  void ratingIsRecalculatedWhenGameStatusIsDrawAndInitialRatingGapIsMoreThanHundred() {
+    RatingCalculation calculation = ratingCalculator.calculate(1101, 1000, GameStatus.Draw);
+
+    assertThat(calculation.getPlayerOneRating()).isEqualTo(1065);
+    assertThat(calculation.getPlayerTwoRating()).isEqualTo(1036);
   }
 
   @Test
@@ -50,7 +58,6 @@ public class RatingCalculatorTest {
     assertThat(calculation.getPlayerOneRating()).isEqualTo(991);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1110);
   }
-
 
   @Test
   void illegalArgumentExceptionIsThrownWhenGameStatusIsInProgress() {
