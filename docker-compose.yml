@@ -17,3 +17,13 @@ services:
     command: --auth
     volumes:
       - "./mongodb/:/data/db"
+
+  kalah:
+    image: ghcr.io/ivan-fedorov/kalah-game
+    container_name: kalah-game
+    depends_on:
+      - mongodb
+    environment:
+      - "TELEGRAM_TOKEN=$TELEGRAM_TOKEN"
+      - "MONGO_USER=$MONGO_USER"
+      - "MONGO_PASS=$MONGO_PASS"
