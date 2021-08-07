@@ -2,6 +2,7 @@ package com.fivan.kalah.service;
 
 import com.fivan.kalah.dto.BoardRepresentation;
 import com.fivan.kalah.entity.Board;
+import com.fivan.kalah.entity.GameStatus;
 import com.fivan.kalah.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class GameService {
 
   private final GameRepository repository;
   private final PlayerService playerService;
+  private final RatingService ratingService;
 
   public BoardRepresentation createGame(Integer player1, Integer player2) {
     if (player1.equals(player2)) {
@@ -34,7 +36,15 @@ public class GameService {
 
   public BoardRepresentation makeMove(UUID gameId, Integer playerId, Integer pitIndex) {
     BoardRepresentation boardRepresentation = getById(gameId, playerId);
-    BoardRepresentation afterMove = Board.fromRepresentation(boardRepresentation).makeMove(pitIndex, playerId);
+    BoardRepresentation afterMove = Board.fromRepresentation(boardRepresentation)
+        .makeMove(pitIndex, playerId);
+    if (afterMove.getGameStatus() != GameStatus.InProgress) {
+      this.ratingService.updateRating(
+          boardRepresentation.getPlayerOne(),
+          boardRepresentation.getPlayerTwo(),
+          boardRepresentation.getGameStatus()
+      );
+    }
     return repository.save(afterMove);
   }
 

@@ -8,6 +8,7 @@ plugins {
 group = 'com.fivan'
 version = '0.0.3'
 sourceCompatibility = '1.11'
+targetCompatibility = '1.11'
 
 jib.container.mainClass = "com.fivan.kalah.KalahApplication"
 jib.to.image = 'ghcr.io/ivan-fedorov/kalah-game:latest'
