@@ -15,16 +15,16 @@ public class RatingCalculatorTest {
   void hundredPointsAddedToPlayerOneWhenInitialRatingIsEqualAndPlayerOneWins() {
     RatingCalculation calculation = ratingCalculator.calculate(1000, 1000, GameStatus.PlayerOneWins);
 
-    assertThat(calculation.getPlayerOneRating()).isEqualTo(1100);
-    assertThat(calculation.getPlayerTwoRating()).isEqualTo(900);
+    assertThat(calculation.getPlayerOneRating()).isEqualTo(1010);
+    assertThat(calculation.getPlayerTwoRating()).isEqualTo(990);
   }
 
   @Test
   void hundredPointsAddedToPlayerTwoWhenInitialRatingIsEqualAndPlayerTwoWins() {
     RatingCalculation calculation = ratingCalculator.calculate(1000, 1000, GameStatus.PlayerTwoWins);
 
-    assertThat(calculation.getPlayerOneRating()).isEqualTo(900);
-    assertThat(calculation.getPlayerTwoRating()).isEqualTo(1100);
+    assertThat(calculation.getPlayerOneRating()).isEqualTo(990);
+    assertThat(calculation.getPlayerTwoRating()).isEqualTo(1010);
   }
 
   @Test
@@ -39,8 +39,8 @@ public class RatingCalculatorTest {
   void ratingIsRecalculatedWhenGameStatusIsDrawAndInitialRatingGapIsMoreThanHundred() {
     RatingCalculation calculation = ratingCalculator.calculate(1101, 1000, GameStatus.Draw);
 
-    assertThat(calculation.getPlayerOneRating()).isEqualTo(1065);
-    assertThat(calculation.getPlayerTwoRating()).isEqualTo(1036);
+    assertThat(calculation.getPlayerOneRating()).isEqualTo(1095);
+    assertThat(calculation.getPlayerTwoRating()).isEqualTo(1006);
   }
 
   @Test
@@ -55,8 +55,8 @@ public class RatingCalculatorTest {
   void ratingIsChangedWhenLoserRatingIsLowerThanWinnerRatingOnMoreThanHundredPoints() {
     RatingCalculation calculation = ratingCalculator.calculate(1101, 1000, GameStatus.PlayerTwoWins);
 
-    assertThat(calculation.getPlayerOneRating()).isEqualTo(991);
-    assertThat(calculation.getPlayerTwoRating()).isEqualTo(1110);
+    assertThat(calculation.getPlayerOneRating()).isEqualTo(1081);
+    assertThat(calculation.getPlayerTwoRating()).isEqualTo(1020);
   }
 
   @Test
