@@ -17,6 +17,8 @@ public class RatingCalculatorTest {
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1010);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(990);
+    assertThat(calculation.getPlayerOneDelta()).isEqualTo(10);
+    assertThat(calculation.getPlayerTwoDelta()).isEqualTo(-10);
   }
 
   @Test
@@ -25,6 +27,8 @@ public class RatingCalculatorTest {
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(990);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1010);
+    assertThat(calculation.getPlayerOneDelta()).isEqualTo(-10);
+    assertThat(calculation.getPlayerTwoDelta()).isEqualTo(10);
   }
 
   @Test
@@ -33,6 +37,8 @@ public class RatingCalculatorTest {
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1000);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1000);
+    assertThat(calculation.getPlayerOneDelta()).isEqualTo(0);
+    assertThat(calculation.getPlayerTwoDelta()).isEqualTo(0);
   }
 
   @Test
@@ -41,6 +47,8 @@ public class RatingCalculatorTest {
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1095);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1006);
+    assertThat(calculation.getPlayerOneDelta()).isEqualTo(-6);
+    assertThat(calculation.getPlayerTwoDelta()).isEqualTo(6);
   }
 
   @Test
@@ -49,6 +57,8 @@ public class RatingCalculatorTest {
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1101);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1000);
+    assertThat(calculation.getPlayerOneDelta()).isEqualTo(0);
+    assertThat(calculation.getPlayerTwoDelta()).isEqualTo(0);
   }
 
   @Test
@@ -57,6 +67,18 @@ public class RatingCalculatorTest {
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1081);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1020);
+    assertThat(calculation.getPlayerOneDelta()).isEqualTo(-20);
+    assertThat(calculation.getPlayerTwoDelta()).isEqualTo(20);
+  }
+
+  @Test
+  void ratingCannotBecomeLowerThanWhenLoserRatingIsTooLow() {
+    RatingCalculation calculation = ratingCalculator.calculate(10, 5, GameStatus.PlayerOneWins);
+
+    assertThat(calculation.getPlayerOneRating()).isEqualTo(19);
+    assertThat(calculation.getPlayerTwoRating()).isEqualTo(1);
+    assertThat(calculation.getPlayerOneDelta()).isEqualTo(9);
+    assertThat(calculation.getPlayerTwoDelta()).isEqualTo(-4);
   }
 
   @Test

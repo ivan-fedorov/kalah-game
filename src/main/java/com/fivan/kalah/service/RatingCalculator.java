@@ -3,6 +3,7 @@ package com.fivan.kalah.service;
 import com.fivan.kalah.entity.GameStatus;
 import java.util.function.BinaryOperator;
 import lombok.Builder;
+import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,8 @@ public class RatingCalculator {
     WinnerLoserRating ratings = resolveWinnerLoserRatings(status, playerOneRating, playerTwoRating);
     if (ratings.getWinnerRating() - ratings.getLoserRating() > 100) {
       return RatingCalculation.builder()
+          .playerOneDelta(0)
+          .playerTwoDelta(0)
           .playerOneRating(playerOneRating)
           .playerTwoRating(playerTwoRating)
           .build();
@@ -41,9 +44,14 @@ public class RatingCalculator {
     int newLoserRating = Math.max(potentialLoserRating, 1);
     int newWinnerRating = winnerRating + delta;
 
+    int playerOneRating = status == GameStatus.PlayerOneWins ? newWinnerRating : newLoserRating;
+    int playerTwoRating = status == GameStatus.PlayerTwoWins ? newWinnerRating : newLoserRating;
+
     return RatingCalculation.builder()
-        .playerOneRating(status == GameStatus.PlayerOneWins ? newWinnerRating : newLoserRating)
-        .playerTwoRating(status == GameStatus.PlayerTwoWins ? newWinnerRating : newLoserRating)
+        .playerOneDelta(status == GameStatus.PlayerOneWins ? delta : newLoserRating - loserRating)
+        .playerTwoDelta(status == GameStatus.PlayerTwoWins ? delta : newLoserRating - loserRating)
+        .playerOneRating(playerOneRating)
+        .playerTwoRating(playerTwoRating)
         .build();
   }
 
@@ -51,6 +59,8 @@ public class RatingCalculator {
     int initialGap = Math.abs(playerOneRating - playerTwoRating);
     if (initialGap <= 100) {
       return RatingCalculation.builder()
+          .playerOneDelta(0)
+          .playerTwoDelta(0)
           .playerOneRating(playerOneRating)
           .playerTwoRating(playerTwoRating)
           .build();
@@ -79,8 +89,14 @@ public class RatingCalculator {
   @Value
   @Builder
   public static class RatingCalculation {
-    int playerOneRating;
-    int playerTwoRating;
+    @NonNull
+    Integer playerOneDelta;
+    @NonNull
+    Integer playerTwoDelta;
+    @NonNull
+    Integer playerOneRating;
+    @NonNull
+    Integer playerTwoRating;
   }
 
   @Value
