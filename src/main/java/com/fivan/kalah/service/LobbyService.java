@@ -29,8 +29,8 @@ public class LobbyService {
     manageUpdate(lobbyId, lobby -> lobby.withPlayerTwoMessageId(messageId));
   }
 
-  public Optional<Lobby> findById(UUID id) {
-    return repository.findById(id);
+  public Optional<Lobby> findEmptyLobbyById(UUID id) {
+    return repository.findByIdAndBoardIdIsNull(id);
   }
 
   public void addBoardId(UUID lobbyId, UUID boardId) {
