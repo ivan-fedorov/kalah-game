@@ -52,7 +52,8 @@ public class InitialStateHandler implements StateHandler {
       String potentialLobbyId = splitMessage[1];
       try {
         UUID lobbyId = UUID.fromString(potentialLobbyId);
-        Lobby lobby = lobbyService.findById(lobbyId).orElseThrow();
+        Lobby lobby = lobbyService.findById(lobbyId)
+            .orElseThrow(() -> new IllegalArgumentException("Couldn't find lobby with id " + lobbyId));
         Integer opponentPlayerId = lobby.getPlayerId();
         BoardRepresentation board = gameService.createGame(opponentPlayerId, playerId);
         lobbyService.addBoardId(lobbyId, board.getId());
