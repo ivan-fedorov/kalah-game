@@ -10,5 +10,5 @@ import java.util.UUID;
 @Repository
 public interface LobbyRepository extends CrudRepository<Lobby, UUID> {
   Optional<Lobby> findByBoardId(UUID boardId);
-  Optional<Lobby> findByIdAndBoardIdIsNull(UUID boardId);
+  Optional<Lobby> findByIdAndBoardIdIsNull(UUID id);
 }

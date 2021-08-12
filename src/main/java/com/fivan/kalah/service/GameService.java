@@ -43,7 +43,7 @@ public class GameService {
     BoardRepresentation savedUpdatedBoard = repository.save(afterMove);
     RatingCalculation ratingCalculation = null;
     if (afterMove.getGameStatus() != GameStatus.InProgress) {
-      ratingCalculation = this.ratingService.updateRating(
+      ratingCalculation = ratingService.updateRating(
           boardRepresentation.getPlayerOne(),
           boardRepresentation.getPlayerTwo(),
           afterMove.getGameStatus()
