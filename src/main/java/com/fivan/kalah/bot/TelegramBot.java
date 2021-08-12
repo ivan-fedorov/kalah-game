@@ -23,20 +23,33 @@ public class TelegramBot extends TelegramLongPollingBot {
 
   @Override
   public void onUpdateReceived(Update update) {
-    ActionsAndMethods actionsAndMethods = dispatcherHandler.handle(update);
-    for (BotApiMethod<?> botApiMethod : actionsAndMethods.getMethods()) {
-      try {
-        execute(botApiMethod);
-      } catch (Exception e) {
-        log.warn("Something went wrong with Telegram API for method: {}", botApiMethod.getMethod(), e);
+    try {
+      ActionsAndMethods actionsAndMethods = dispatcherHandler.handle(update);
+      for (BotApiMethod<?> botApiMethod : actionsAndMethods.getMethods()) {
+        executeMethod(botApiMethod);
       }
+      for (LobbySendMessageAction action : actionsAndMethods.getActions()) {
+        executeAction(action);
+      }
+    } catch (Exception e) {
+      log.warn("Couldn't handle update: {}", update.getUpdateId(), e);
     }
-    for (LobbySendMessageAction action : actionsAndMethods.getActions()) {
-      try {
-        action.execute(this);
-      } catch (Exception e) {
-        log.warn("Something went wrong with Telegram API for action: {}", action, e);
-      }
+  }
+
+  private void executeAction(LobbySendMessageAction action) {
+    try {
+      action.execute(this);
+    } catch (Exception e) {
+      log.warn("Something went wrong with Telegram API for action: {}", action, e);
+    }
+  }
+
+  private void executeMethod(BotApiMethod<?> botApiMethod) {
+    try {
+      execute(botApiMethod);
+    } catch (Exception e) {
+      log.warn("Something went wrong with Telegram API for method: {}",
+          botApiMethod.getMethod(), e);
     }
   }
 

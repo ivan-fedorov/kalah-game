@@ -73,7 +73,7 @@ public class RatingCalculator {
   }
 
   private int calculateWinLoseRatingDelta(int winnerRating, int loserRating) {
-    return 100 - (winnerRating - loserRating) / 10;
+    return (100 - (winnerRating - loserRating)) / 10;
   }
 
   @Value
