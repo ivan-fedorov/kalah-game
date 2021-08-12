@@ -18,7 +18,7 @@ public class RatingService {
    * Calculates new rating for both players and persist it. Rating is calculated by the rules
    * described here: https://rttf.ru/content/2
    */
-  public void updateRating(Integer playerOneId, Integer playerTwoId, GameStatus status) {
+  public RatingCalculation updateRating(Integer playerOneId, Integer playerTwoId, GameStatus status) {
     Player playerOne = playerRepository.findById(playerOneId).orElseThrow();
     Player playerTwo = playerRepository.findById(playerTwoId).orElseThrow();
 
@@ -27,6 +27,8 @@ public class RatingService {
 
     playerRepository.save(playerOne.withRating(calculation.getPlayerOneRating()));
     playerRepository.save(playerTwo.withRating(calculation.getPlayerTwoRating()));
+
+    return calculation;
   }
 
 }
