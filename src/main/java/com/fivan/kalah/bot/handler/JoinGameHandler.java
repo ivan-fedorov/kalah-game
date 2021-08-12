@@ -44,7 +44,7 @@ public class JoinGameHandler {
     String potentialLobbyId = splitMessage[1];
     try {
       UUID lobbyId = UUID.fromString(potentialLobbyId);
-      Lobby lobby = lobbyService.findById(lobbyId)
+      Lobby lobby = lobbyService.findEmptyLobbyById(lobbyId)
           .orElseThrow(() -> new IllegalArgumentException("Couldn't find lobby with id " + lobbyId));
       Integer opponentPlayerId = lobby.getPlayerId();
       Integer playerId = GameUtils.getUserIdFromMessage(update);
