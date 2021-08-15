@@ -1,0 +1,7 @@
+scrape_configs:
+  - job_name: kalah
+    scrape_interval: 30s
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets:
+          - kalah:8080
