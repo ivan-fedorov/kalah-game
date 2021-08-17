@@ -16,8 +16,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class TelegramBot extends TelegramLongPollingBot {
 
   private final DispatcherHandler dispatcherHandler;
+
   @Value("${bot.telegram.name}")
   private String botName;
+
   @Value("${bot.telegram.token}")
   private String token;
 
@@ -48,8 +50,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     try {
       execute(botApiMethod);
     } catch (Exception e) {
-      log.warn("Something went wrong with Telegram API for method: {}",
-          botApiMethod.getMethod(), e);
+      log.warn(
+          "Something went wrong with Telegram API for method: {}", botApiMethod.getMethod(), e);
     }
   }
 

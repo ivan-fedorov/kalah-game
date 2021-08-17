@@ -10,13 +10,11 @@ import java.util.UUID;
 @Value
 @Builder
 public class Lobby {
-  @Id
-  UUID id;
+  @Id UUID id;
   Integer playerId;
-  @With
-  Integer playerOneMessageId;
-  @With
-  Integer playerTwoMessageId;
-  @With
-  UUID boardId;
+  @With Integer playerOneMessageId;
+  @With Integer playerTwoMessageId;
+  @With UUID boardId;
+  @With Player playerOne;
+  @With Player playerTwo;
 }

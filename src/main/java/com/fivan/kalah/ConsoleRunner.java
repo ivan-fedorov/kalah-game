@@ -1,21 +1,22 @@
 package com.fivan.kalah;
 
-import static com.fivan.kalah.entity.GameStatus.InProgress;
-import static com.fivan.kalah.entity.Player.player;
-
 import com.fivan.kalah.dto.BoardRepresentation;
 import com.fivan.kalah.entity.Board;
 import com.fivan.kalah.entity.Player;
+
 import java.util.Map;
 import java.util.Scanner;
+
+import static com.fivan.kalah.entity.GameStatus.InProgress;
+import static com.fivan.kalah.entity.Player.player;
 
 public class ConsoleRunner {
 
   private static final Player FIRST_PLAYER = player(1, "Paul");
   private static final Player SECOND_PLAYER = player(2, "John");
 
-  private static final Map<Integer, Player> PLAYER_BY_ID = Map.of(FIRST_PLAYER.getId(), FIRST_PLAYER,
-      SECOND_PLAYER.getId(), SECOND_PLAYER);
+  private static final Map<Integer, Player> PLAYER_BY_ID =
+      Map.of(FIRST_PLAYER.getId(), FIRST_PLAYER, SECOND_PLAYER.getId(), SECOND_PLAYER);
 
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
@@ -40,6 +41,6 @@ public class ConsoleRunner {
     }
     System.out.println();
     System.out.println(representation.getGameStatus());
-    System.out.println(representation.toString());
+    System.out.println(representation);
   }
 }

@@ -38,16 +38,19 @@ public class KeyboardService {
     return playerOneKeyboardMarkup;
   }
 
-  private List<InlineKeyboardButton> fillPlayerOneRow(Integer playerId, BoardRepresentation board, boolean isPlayerTwo) {
+  private List<InlineKeyboardButton> fillPlayerOneRow(
+      Integer playerId, BoardRepresentation board, boolean isPlayerTwo) {
     LinkedList<InlineKeyboardButton> playerOneRow = new LinkedList<>();
 
     List<Integer> playerOnePits = board.getPlayerPits(playerId);
 
     for (int i = 0; i < playerOnePits.size(); i++) {
       Integer pit = playerOnePits.get(i);
-      InlineKeyboardButton pitButton = new InlineKeyboardButton()
-          .setText(pit.toString())
-          .setCallbackData(isPlayerTwo ? NON_OPERATIONAL : callbackDataForMove(board.getId(), i));
+      InlineKeyboardButton pitButton =
+          new InlineKeyboardButton()
+              .setText(pit.toString())
+              .setCallbackData(
+                  isPlayerTwo ? NON_OPERATIONAL : callbackDataForMove(board.getId(), i));
       playerOneRow.add(pitButton);
     }
     playerOneRow.addFirst(new InlineKeyboardButton().setText("-").setCallbackData(NON_OPERATIONAL));
@@ -59,7 +62,8 @@ public class KeyboardService {
     return playerOneRow;
   }
 
-  private List<InlineKeyboardButton> fillPlayerTwoRow(Integer playerId, BoardRepresentation board, boolean isPlayerTwo) {
+  private List<InlineKeyboardButton> fillPlayerTwoRow(
+      Integer playerId, BoardRepresentation board, boolean isPlayerTwo) {
     LinkedList<InlineKeyboardButton> playerTwoRow = new LinkedList<>();
 
     List<Integer> playerTwoPits = board.getPlayerPits(playerId);
@@ -67,9 +71,11 @@ public class KeyboardService {
     int pitSize = playerTwoPits.size() - 1;
     for (int i = 0; i <= pitSize; i++) {
       Integer pit = playerTwoPits.get(i);
-      InlineKeyboardButton pitButton = new InlineKeyboardButton()
-          .setText(pit.toString())
-          .setCallbackData(isPlayerTwo ? callbackDataForMove(board.getId(), pitSize - i) : NON_OPERATIONAL);
+      InlineKeyboardButton pitButton =
+          new InlineKeyboardButton()
+              .setText(pit.toString())
+              .setCallbackData(
+                  isPlayerTwo ? callbackDataForMove(board.getId(), pitSize - i) : NON_OPERATIONAL);
       playerTwoRow.addFirst(pitButton);
     }
     playerTwoRow.addFirst(new InlineKeyboardButton().setText("-").setCallbackData(NON_OPERATIONAL));
@@ -82,10 +88,8 @@ public class KeyboardService {
   }
 
   private String callbackDataForMove(UUID boardId, int pitId) {
-    MakeMoveCallbackData callbackData = MakeMoveCallbackData.builder()
-        .boardId(boardId)
-        .pitId(pitId)
-        .build();
+    MakeMoveCallbackData callbackData =
+        MakeMoveCallbackData.builder().boardId(boardId).pitId(pitId).build();
     return callbackDataFactory.toStringRepresentation(callbackData);
   }
 }
