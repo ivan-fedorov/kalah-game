@@ -10,8 +10,6 @@ import java.util.List;
 @Value
 @Builder
 public class ActionsAndMethods {
-  @Builder.Default
-  List<BotApiMethod<?>> methods = List.of();
-  @Builder.Default
-  List<LobbySendMessageAction> actions = List.of();
+  @Builder.Default List<BotApiMethod<?>> methods = List.of();
+  @Builder.Default List<LobbySendMessageAction> actions = List.of();
 }

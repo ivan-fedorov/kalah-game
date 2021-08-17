@@ -16,9 +16,7 @@ import static com.fivan.kalah.util.GameUtils.listToString;
 import static com.fivan.kalah.util.GameUtils.playerTwoList;
 import static java.util.Arrays.asList;
 
-/**
- * Service that represents board and it operations.
- */
+/** Service that represents board and it operations. */
 @Slf4j
 public class Board {
 
@@ -34,9 +32,9 @@ public class Board {
   /**
    * Creates play board.
    *
-   * @param player1     {@link Integer} of first {@link Player}.
-   * @param player2     {@link Integer} of second {@link Player}.
-   * @param fieldSize   number of pits (including big) for one player.
+   * @param player1 {@link Integer} of first {@link Player}.
+   * @param player2 {@link Integer} of second {@link Player}.
+   * @param fieldSize number of pits (including big) for one player.
    * @param stonesInPit number of stones in one pit.
    */
   public Board(Integer player1, Integer player2, int fieldSize, int stonesInPit) {
@@ -51,8 +49,14 @@ public class Board {
     logBoardState();
   }
 
-  private Board(UUID id, Integer[] board, Integer player1, Integer player2,
-                int fieldSize, Integer currentPlayer, GameStatus gameStatus) {
+  private Board(
+      UUID id,
+      Integer[] board,
+      Integer player1,
+      Integer player2,
+      int fieldSize,
+      Integer currentPlayer,
+      GameStatus gameStatus) {
     this.id = id;
     this.board = board;
     this.roleById = Map.of(player1, PLAYER_ONE, player2, PLAYER_TWO);
@@ -68,9 +72,18 @@ public class Board {
     Collections.reverse(playerTwoPits);
     List<Integer> board = new ArrayList<>(br.getPlayerOnePits());
     board.addAll(playerTwoPits);
-    return new Board(br.getId(), board.<Integer>toArray(new Integer[0]),
-        br.getPlayerOne(), br.getPlayerTwo(),
-        br.getFieldSize(), br.getCurrentPlayer(), br.getGameStatus());
+    return new Board(
+        br.getId(),
+        board.<Integer>toArray(new Integer[0]),
+        br.getPlayerOne(),
+        br.getPlayerTwo(),
+        br.getFieldSize(),
+        br.getCurrentPlayer(),
+        br.getGameStatus());
+  }
+
+  private static boolean isEmptyPits(List<Integer> playerOneStones) {
+    return playerOneStones.stream().allMatch(stones -> stones.equals(0));
   }
 
   public BoardRepresentation makeMove(int pitIndex, Integer playerId) {
@@ -92,13 +105,14 @@ public class Board {
   }
 
   public BoardRepresentation toRepresentation() {
-    return boardRepresentation(id, idByRole.get(PLAYER_ONE), idByRole.get(PLAYER_TWO),
-        board, gameStatus, currentPlayer);
+    return boardRepresentation(
+        id, idByRole.get(PLAYER_ONE), idByRole.get(PLAYER_TWO), board, gameStatus, currentPlayer);
   }
 
   private void moveStones(int pitIndex, PlayerRole playerRole) {
     if (pitIndex >= lastPitIndex) {
-      throw new IllegalArgumentException("Player can take stones only from 0 to " + (lastPitIndex - 1) + " pit");
+      throw new IllegalArgumentException(
+          "Player can take stones only from 0 to " + (lastPitIndex - 1) + " pit");
     }
     int pitToEmpty = pitIndex + (playerRole.getPlayerIndex() - 1) * fieldSize;
     int stones = board[pitToEmpty];
@@ -106,7 +120,10 @@ public class Board {
 
     int currentPit = pitToEmpty + 1;
     for (int i = 0; i < stones; i++) {
-      if (currentPit == getOtherPlayer(playerRole).getPlayerIndex() * lastPitIndex + getOtherPlayer(playerRole).getPlayerIndex() - 1) {
+      if (currentPit
+          == getOtherPlayer(playerRole).getPlayerIndex() * lastPitIndex
+              + getOtherPlayer(playerRole).getPlayerIndex()
+              - 1) {
         i--;
         currentPit++;
         currentPit %= fieldSize * 2;
@@ -119,7 +136,8 @@ public class Board {
       }
     }
 
-    if (currentPit < getBigPit(playerRole) && fieldSize * (playerRole.getPlayerIndex() - 1) <= currentPit) {
+    if (currentPit < getBigPit(playerRole)
+        && fieldSize * (playerRole.getPlayerIndex() - 1) <= currentPit) {
       if (board[currentPit] == 1) {
         board[getBigPit(playerRole)] += board[lastPitIndex * 2 - currentPit] + 1;
         board[lastPitIndex * 2 - currentPit] = 0;
@@ -151,10 +169,6 @@ public class Board {
     return toRepresentation();
   }
 
-  private static boolean isEmptyPits(List<Integer> playerOneStones) {
-    return playerOneStones.stream().allMatch(stones -> stones.equals(0));
-  }
-
   private int getBigPit(PlayerRole playerRole) {
     return playerRole.getPlayerIndex() * fieldSize - 1;
   }
@@ -181,7 +195,8 @@ public class Board {
   }
 
   private void logBoardState() {
-    log.info("Board: \n {} \n     {}",
+    log.info(
+        "Board: \n {} \n     {}",
         listToString(playerTwoList(board, fieldSize)),
         listToString(asList(board).subList(0, fieldSize)));
   }
@@ -191,8 +206,6 @@ public class Board {
     PLAYER_ONE(1),
     PLAYER_TWO(2);
 
-    @Getter
-    private final int playerIndex;
+    @Getter private final int playerIndex;
   }
-
 }

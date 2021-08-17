@@ -10,8 +10,6 @@ import java.util.List;
 @Builder
 public class HandlingResult {
   Event event;
-  @Builder.Default
-  List<BotApiMethod<?>> methods = List.of();
-  @Builder.Default
-  List<LobbySendMessageAction> actions = List.of();
+  @Builder.Default List<BotApiMethod<?>> methods = List.of();
+  @Builder.Default List<LobbySendMessageAction> actions = List.of();
 }

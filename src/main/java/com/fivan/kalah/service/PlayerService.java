@@ -23,8 +23,6 @@ public class PlayerService {
   }
 
   public boolean playersExistsById(List<Integer> players) {
-    return players.stream()
-        .map(repository::findById)
-        .allMatch(Optional::isPresent);
+    return players.stream().map(repository::findById).allMatch(Optional::isPresent);
   }
 }
