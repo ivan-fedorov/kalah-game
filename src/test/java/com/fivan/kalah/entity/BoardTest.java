@@ -1,9 +1,9 @@
 package com.fivan.kalah.entity;
 
+import org.junit.jupiter.api.Test;
+
 import static com.fivan.kalah.entity.Player.player;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.jupiter.api.Test;
 
 class BoardTest {
 

@@ -1,6 +1,7 @@
 package com.fivan.kalah.service;
 
 import com.fivan.kalah.entity.Lobby;
+import com.fivan.kalah.entity.Player;
 import com.fivan.kalah.repository.LobbyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,17 +34,19 @@ public class LobbyService {
     return repository.findByIdAndBoardIdIsNull(id);
   }
 
-  public void addBoardId(UUID lobbyId, UUID boardId) {
-    manageUpdate(lobbyId, lobby -> lobby.withBoardId(boardId));
+  public void handlePlayerTwoJoining(UUID lobbyId, UUID boardId, Player playerTwo) {
+    manageUpdate(lobbyId, lobby -> lobby.withBoardId(boardId).withPlayerTwo(playerTwo));
   }
 
   public Lobby getByBoardId(UUID boardId) {
-    return repository.findByBoardId(boardId)
-        .orElseThrow();
+    return repository.findByBoardId(boardId).orElseThrow();
   }
 
   private void manageUpdate(UUID lobbyId, Function<Lobby, Lobby> mapper) {
-    repository.findById(lobbyId).map(mapper)
-        .ifPresentOrElse(repository::save, () -> log.warn("Lobby with ID='{}' wasn't found", lobbyId));
+    repository
+        .findById(lobbyId)
+        .map(mapper)
+        .ifPresentOrElse(
+            repository::save, () -> log.warn("Lobby with ID='{}' wasn't found", lobbyId));
   }
 }

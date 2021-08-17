@@ -1,9 +1,10 @@
 package com.fivan.kalah.bot.handler.callback;
 
-import java.util.List;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
+
+import java.util.List;
+import java.util.UUID;
 
 @Value
 @Builder

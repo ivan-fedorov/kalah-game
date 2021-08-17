@@ -20,8 +20,7 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class BoardRepresentation {
-  @Id
-  private final UUID id;
+  @Id private final UUID id;
   private final Integer playerOne;
   private final Integer playerTwo;
   private final List<Integer> playerOnePits;
@@ -29,18 +28,32 @@ public class BoardRepresentation {
   private final GameStatus gameStatus;
   private final Integer currentPlayer;
 
-  @JsonIgnore
-  private final int fieldSize;
+  @JsonIgnore private final int fieldSize;
 
-  public static BoardRepresentation boardRepresentation(UUID id, Integer playerOne, Integer playerTwo, Integer[] board,
-                                                        GameStatus gameStatus, Integer currentPlayer) {
+  public static BoardRepresentation boardRepresentation(
+      UUID id,
+      Integer playerOne,
+      Integer playerTwo,
+      Integer[] board,
+      GameStatus gameStatus,
+      Integer currentPlayer) {
     int fieldSize = board.length / 2;
-    return new BoardRepresentation(id, playerOne, playerTwo, Arrays.stream(board, 0, fieldSize)
-        .collect(toUnmodifiableList()), GameUtils.playerTwoList(board, fieldSize), gameStatus, currentPlayer, fieldSize);
+    return new BoardRepresentation(
+        id,
+        playerOne,
+        playerTwo,
+        Arrays.stream(board, 0, fieldSize).collect(toUnmodifiableList()),
+        GameUtils.playerTwoList(board, fieldSize),
+        gameStatus,
+        currentPlayer,
+        fieldSize);
   }
 
   public String toString() {
-    return '\n' + GameUtils.listToString(playerTwoPits) + "\n    " + GameUtils.listToString(playerOnePits);
+    return '\n'
+        + GameUtils.listToString(playerTwoPits)
+        + "\n    "
+        + GameUtils.listToString(playerOnePits);
   }
 
   public boolean isParticipant(Integer playerId) {
