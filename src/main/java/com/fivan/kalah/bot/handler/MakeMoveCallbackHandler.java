@@ -82,8 +82,8 @@ public class MakeMoveCallbackHandler {
                             lobby.getPlayerTwo().getId())
                         : String.format(
                             resourceBundle.getString("yourTurn"),
-                            lobby.getPlayerOne().getName(),
-                            lobby.getPlayerId()))
+                            lobby.getPlayerTwo().getName(),
+                            lobby.getPlayerTwo().getId()))
                 .setChatId(board.getPlayerOne().longValue())
                 .setReplyMarkup(keyboardService.preparePlayerOneButtons(board))
                 .setMessageId(lobby.getPlayerOneMessageId());
@@ -96,11 +96,11 @@ public class MakeMoveCallbackHandler {
                         ? String.format(
                             resourceBundle.getString("yourTurn"),
                             lobby.getPlayerOne().getName(),
-                            lobby.getPlayerId())
+                            lobby.getPlayerOne().getId())
                         : String.format(
                             resourceBundle.getString("opponentsTurn"),
-                            lobby.getPlayerTwo().getName(),
-                            lobby.getPlayerTwo().getId()))
+                            lobby.getPlayerOne().getName(),
+                            lobby.getPlayerOne().getId()))
                 .setChatId(board.getPlayerTwo().longValue())
                 .setReplyMarkup(keyboardService.preparePlayerTwoButtons(board))
                 .setMessageId(lobby.getPlayerTwoMessageId());
