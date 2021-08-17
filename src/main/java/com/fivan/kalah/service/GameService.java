@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GameService {
 
-  public static final int DEFAULT_FIELD_SIZE = 4;
+  public static final int DEFAULT_FIELD_SIZE = 7;
   public static final int DEFAULT_STONES_IN_PIT = 6;
 
   private final GameRepository repository;
