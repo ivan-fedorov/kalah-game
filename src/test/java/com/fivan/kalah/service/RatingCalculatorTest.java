@@ -1,11 +1,11 @@
 package com.fivan.kalah.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.fivan.kalah.entity.GameStatus;
 import com.fivan.kalah.service.RatingCalculator.RatingCalculation;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class RatingCalculatorTest {
 
@@ -13,7 +13,8 @@ public class RatingCalculatorTest {
 
   @Test
   void hundredPointsAddedToPlayerOneWhenInitialRatingIsEqualAndPlayerOneWins() {
-    RatingCalculation calculation = ratingCalculator.calculate(1000, 1000, GameStatus.PlayerOneWins);
+    RatingCalculation calculation =
+        ratingCalculator.calculate(1000, 1000, GameStatus.PlayerOneWins);
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1010);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(990);
@@ -23,7 +24,8 @@ public class RatingCalculatorTest {
 
   @Test
   void hundredPointsAddedToPlayerTwoWhenInitialRatingIsEqualAndPlayerTwoWins() {
-    RatingCalculation calculation = ratingCalculator.calculate(1000, 1000, GameStatus.PlayerTwoWins);
+    RatingCalculation calculation =
+        ratingCalculator.calculate(1000, 1000, GameStatus.PlayerTwoWins);
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(990);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1010);
@@ -53,7 +55,8 @@ public class RatingCalculatorTest {
 
   @Test
   void ratingIsNotChangedWhenWinnerRatingIsHigherThanLoserRatingOnMoreThanHundredPoints() {
-    RatingCalculation calculation = ratingCalculator.calculate(1101, 1000, GameStatus.PlayerOneWins);
+    RatingCalculation calculation =
+        ratingCalculator.calculate(1101, 1000, GameStatus.PlayerOneWins);
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1101);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1000);
@@ -63,7 +66,8 @@ public class RatingCalculatorTest {
 
   @Test
   void ratingIsChangedWhenLoserRatingIsLowerThanWinnerRatingOnMoreThanHundredPoints() {
-    RatingCalculation calculation = ratingCalculator.calculate(1101, 1000, GameStatus.PlayerTwoWins);
+    RatingCalculation calculation =
+        ratingCalculator.calculate(1101, 1000, GameStatus.PlayerTwoWins);
 
     assertThat(calculation.getPlayerOneRating()).isEqualTo(1081);
     assertThat(calculation.getPlayerTwoRating()).isEqualTo(1020);
@@ -85,7 +89,6 @@ public class RatingCalculatorTest {
   void illegalArgumentExceptionIsThrownWhenGameStatusIsInProgress() {
     assertThatThrownBy(() -> ratingCalculator.calculate(1000, 1000, GameStatus.InProgress))
         .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage( "Rating should not be updated for the games that are in progress");
+        .hasMessage("Rating should not be updated for the games that are in progress");
   }
-
 }

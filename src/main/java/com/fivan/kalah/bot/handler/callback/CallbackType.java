@@ -1,12 +1,13 @@
 package com.fivan.kalah.bot.handler.callback;
 
-import static java.util.stream.Collectors.toMap;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+
+import static java.util.stream.Collectors.toMap;
 
 @Getter
 @RequiredArgsConstructor

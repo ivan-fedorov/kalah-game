@@ -33,4 +33,11 @@ public class GameUtils {
         .map(User::getId)
         .orElseGet(() -> update.getCallbackQuery().getFrom().getId());
   }
+
+  public static String getUsername(User user) {
+    return Optional.ofNullable(user.getUserName())
+        .or(() -> Optional.ofNullable(user.getFirstName()))
+        .or(() -> Optional.ofNullable(user.getLastName()))
+        .orElse("Anonymous");
+  }
 }

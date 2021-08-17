@@ -17,5 +17,4 @@ public class CallbackDataFactory {
     String[] split = callback.split(DELIMITER);
     return new MakeMoveCallbackData(UUID.fromString(split[1]), Integer.valueOf(split[2]));
   }
-
 }
