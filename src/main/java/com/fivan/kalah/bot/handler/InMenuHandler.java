@@ -4,8 +4,10 @@ import com.fivan.kalah.bot.Event;
 import com.fivan.kalah.bot.HandlingResult;
 import com.fivan.kalah.bot.State;
 import com.fivan.kalah.entity.Lobby;
+import com.fivan.kalah.entity.Player;
 import com.fivan.kalah.service.LobbyService;
 import com.fivan.kalah.service.PlayerService;
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -24,6 +26,7 @@ import java.util.UUID;
 
 import static com.fivan.kalah.util.GameUtils.getUserIdFromMessage;
 import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.joining;
 
 @Handler(State.IN_MENU)
 public class InMenuHandler implements StateHandler {
@@ -36,6 +39,10 @@ public class InMenuHandler implements StateHandler {
   private final String botName;
   private final String readRulesButtonText;
   private final String createNewButtonText;
+  private final String showTopTenPlayerButtonText;
+  private final String positionColumnName;
+  private final String nameColumnName;
+  private final String ratingColumnName;
 
   public InMenuHandler(
       LobbyService lobbyService,
@@ -48,6 +55,10 @@ public class InMenuHandler implements StateHandler {
     this.botName = botName;
     this.createNewButtonText = messageBundle.getString("createNewButtonText");
     this.readRulesButtonText = messageBundle.getString("readRulesButtonText");
+    this.showTopTenPlayerButtonText = messageBundle.getString("showTopTenPlayerButtonText");
+    this.positionColumnName = messageBundle.getString("positionColumnName");
+    this.nameColumnName = messageBundle.getString("nameColumnName");
+    this.ratingColumnName = messageBundle.getString("ratingColumnName");
   }
 
   @Override
@@ -77,6 +88,43 @@ public class InMenuHandler implements StateHandler {
               .setText(messageBundle.getString("gameRules"))
               .setChatId(userId.longValue()));
     }
+    if (update.getMessage().getText().equals(showTopTenPlayerButtonText)) {
+      List<Player> topTenPlayers = playerService.findTopTenPlayers();
+
+      int maxNameSize =
+          topTenPlayers.stream().map(Player::getName).mapToInt(String::length).max().orElseThrow();
+      ArrayList<List<String>> tableRow = new ArrayList<>();
+      tableRow.add(List.of(positionColumnName, nameColumnName, ratingColumnName));
+      tableRow.add(
+          List.of(
+              "-".repeat(positionColumnName.length()),
+              "-".repeat(maxNameSize),
+              "-".repeat(ratingColumnName.length())));
+      for (int i = 0; i < topTenPlayers.size(); i++) {
+        tableRow.add(
+            List.of(
+                String.valueOf(i + 1),
+                topTenPlayers.get(i).getName(),
+                topTenPlayers.get(i).getRating().toString()));
+      }
+
+      String tableText =
+          tableRow.stream()
+              .map(
+                  row ->
+                      List.of(
+                          Strings.padEnd(row.get(0), positionColumnName.length(), ' '),
+                          Strings.padEnd(row.get(1), maxNameSize, ' '),
+                          Strings.padEnd(row.get(2), ratingColumnName.length(), ' ')))
+              .map(row -> row.stream().collect(joining(" | ", "| ", " |")))
+              .collect(joining("\n", "```\n", "\n```"));
+
+      botApiMethods.add(
+          new SendMessage()
+              .setParseMode(ParseMode.MARKDOWN)
+              .setText(tableText)
+              .setChatId(userId.longValue()));
+    }
 
     return HandlingResult.builder().event(Event.TO_MENU).methods(botApiMethods).build();
   }
@@ -88,6 +136,7 @@ public class InMenuHandler implements StateHandler {
 
     gameRow.add(createNewButtonText);
     gameRow.add(readRulesButtonText);
+    gameRow.add(showTopTenPlayerButtonText);
 
     return singletonList(
         new SendMessage()
