@@ -31,7 +31,7 @@ public class JoinGameHandler {
   private final LobbyService lobbyService;
   private final GameService gameService;
   private final PlayerService playerService;
-  private final ResourceBundle resourceBundle;
+  private final ResourceBundle messageBundle;
   private final KeyboardService keyboardService;
 
   public Optional<HandlingResult> handle(Update update) {
@@ -63,7 +63,7 @@ public class JoinGameHandler {
               .setParseMode(ParseMode.MARKDOWN)
               .setText(
                   String.format(
-                      resourceBundle.getString("yourTurn"), playerTwo.getName(), playerTwo.getId()))
+                      messageBundle.getString("yourTurn"), playerTwo.getName(), playerTwo.getId()))
               .setChatId(board.getPlayerOne().longValue())
               .setReplyMarkup(keyboardService.preparePlayerOneButtons(board));
 
@@ -72,7 +72,7 @@ public class JoinGameHandler {
               .setParseMode(ParseMode.MARKDOWN)
               .setText(
                   String.format(
-                      resourceBundle.getString("opponentsTurn"),
+                      messageBundle.getString("opponentsTurn"),
                       lobby.getPlayerOne().getName(),
                       lobby.getPlayerOne().getId()))
               .setChatId(board.getPlayerTwo().longValue())
