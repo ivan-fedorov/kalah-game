@@ -33,7 +33,7 @@ public class MakeMoveCallbackHandler {
   private final CallbackDataFactory callbackDataFactory;
   private final LobbyService lobbyService;
   private final KeyboardService keyboardService;
-  private final ResourceBundle resourceBundle;
+  private final ResourceBundle messageBundle;
 
   public boolean canProcess(Update update) {
     return update.getCallbackQuery() != null
@@ -77,11 +77,11 @@ public class MakeMoveCallbackHandler {
                 .setText(
                     isPlayerTwoTurn
                         ? String.format(
-                            resourceBundle.getString("opponentsTurn"),
+                            messageBundle.getString("opponentsTurn"),
                             lobby.getPlayerTwo().getName(),
                             lobby.getPlayerTwo().getId())
                         : String.format(
-                            resourceBundle.getString("yourTurn"),
+                            messageBundle.getString("yourTurn"),
                             lobby.getPlayerTwo().getName(),
                             lobby.getPlayerTwo().getId()))
                 .setChatId(board.getPlayerOne().longValue())
@@ -94,11 +94,11 @@ public class MakeMoveCallbackHandler {
                 .setText(
                     isPlayerTwoTurn
                         ? String.format(
-                            resourceBundle.getString("yourTurn"),
+                            messageBundle.getString("yourTurn"),
                             lobby.getPlayerOne().getName(),
                             lobby.getPlayerOne().getId())
                         : String.format(
-                            resourceBundle.getString("opponentsTurn"),
+                            messageBundle.getString("opponentsTurn"),
                             lobby.getPlayerOne().getName(),
                             lobby.getPlayerOne().getId()))
                 .setChatId(board.getPlayerTwo().longValue())
@@ -109,7 +109,7 @@ public class MakeMoveCallbackHandler {
     } catch (MakeMoveInFinishedGameException e) {
       return List.of(
           new AnswerCallbackQuery()
-              .setText(resourceBundle.getString("gameEnded"))
+              .setText(messageBundle.getString("gameEnded"))
               .setCallbackQueryId(update.getCallbackQuery().getId()));
     }
   }
@@ -121,13 +121,13 @@ public class MakeMoveCallbackHandler {
       case PlayerOneWins:
         return new String[] {
           String.format(
-              resourceBundle.getString("playerWinMessage"),
+              messageBundle.getString("playerWinMessage"),
               opponent.getName(),
               opponent.getId(),
               rating.getPlayerOneRating(),
               rating.getPlayerOneDelta()),
           String.format(
-              resourceBundle.getString("playerLoseMessage"),
+              messageBundle.getString("playerLoseMessage"),
               opponent.getName(),
               opponent.getId(),
               rating.getPlayerTwoRating(),
@@ -136,13 +136,13 @@ public class MakeMoveCallbackHandler {
       case PlayerTwoWins:
         return new String[] {
           String.format(
-              resourceBundle.getString("playerLoseMessage"),
+              messageBundle.getString("playerLoseMessage"),
               opponent.getName(),
               opponent.getId(),
               rating.getPlayerOneRating(),
               rating.getPlayerOneDelta()),
           String.format(
-              resourceBundle.getString("playerWinMessage"),
+              messageBundle.getString("playerWinMessage"),
               opponent.getName(),
               opponent.getId(),
               rating.getPlayerTwoRating(),
@@ -151,13 +151,13 @@ public class MakeMoveCallbackHandler {
       case Draw:
         return new String[] {
           String.format(
-              resourceBundle.getString("drawMessage"),
+              messageBundle.getString("drawMessage"),
               opponent.getName(),
               opponent.getId(),
               rating.getPlayerOneRating(),
               rating.getPlayerOneDelta()),
           String.format(
-              resourceBundle.getString("drawMessage"),
+              messageBundle.getString("drawMessage"),
               opponent.getName(),
               opponent.getId(),
               rating.getPlayerTwoRating(),

@@ -26,7 +26,7 @@ public class InitialStateHandler implements StateHandler {
 
   private final PlayerService playerService;
   private final JoinGameHandler joinGameHandler;
-  private final ResourceBundle resourceBundle;
+  private final ResourceBundle messageBundle;
 
   @Override
   public HandlingResult handle(Update update) {
@@ -39,7 +39,7 @@ public class InitialStateHandler implements StateHandler {
       playerService.save(newPlayer);
       botApiMethods.add(
           new SendMessage()
-              .setText(String.format(resourceBundle.getString("welcomeMessage"), userName))
+              .setText(String.format(messageBundle.getString("welcomeMessage"), userName))
               .setChatId(playerId.longValue()));
     }
 
