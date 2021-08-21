@@ -9,6 +9,7 @@ import com.fivan.kalah.service.PlayerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -31,7 +32,8 @@ public class InMenuHandler implements StateHandler {
 
   private static final String URL_TEMPLATE_START = "https://telegram.me/";
   private static final String URL_TEMPLATE_END = "?start=";
-  private static final String CREATE_NEW = "Create new";
+  private static final String CREATE_NEW_BUTTON_TEXT = "Create new";
+  private static final String GAME_RULES_BUTTON_TEXT = "Show rules";
   private final LobbyService lobbyService;
   private final PlayerService playerService;
   private final ResourceBundle resourceBundle;
@@ -43,7 +45,7 @@ public class InMenuHandler implements StateHandler {
   public HandlingResult handle(Update update) {
     var botApiMethods = new ArrayList<BotApiMethod<?>>();
     Integer userId = getUserIdFromMessage(update);
-    if (update.getMessage().getText().equals(CREATE_NEW)) {
+    if (update.getMessage().getText().equals(CREATE_NEW_BUTTON_TEXT)) {
       Lobby lobby =
           lobbyService.createLobby(
               Lobby.builder()
@@ -59,6 +61,13 @@ public class InMenuHandler implements StateHandler {
               .setChatId(userId.longValue())
               .setReplyMarkup(createLobbyKeyboard(lobbyId)));
     }
+    if (update.getMessage().getText().equals(GAME_RULES_BUTTON_TEXT)) {
+      botApiMethods.add(
+          new SendMessage()
+              .setParseMode(ParseMode.MARKDOWN)
+              .setText(resourceBundle.getString("gameRules"))
+              .setChatId(userId.longValue()));
+    }
 
     return HandlingResult.builder().event(Event.TO_MENU).methods(botApiMethods).build();
   }
@@ -68,7 +77,8 @@ public class InMenuHandler implements StateHandler {
     Integer userId = getUserIdFromMessage(update);
     KeyboardRow gameRow = new KeyboardRow();
 
-    gameRow.add(CREATE_NEW);
+    gameRow.add(CREATE_NEW_BUTTON_TEXT);
+    gameRow.add(GAME_RULES_BUTTON_TEXT);
 
     return singletonList(
         new SendMessage()
