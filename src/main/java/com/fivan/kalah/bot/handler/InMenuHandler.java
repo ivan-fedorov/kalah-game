@@ -6,7 +6,6 @@ import com.fivan.kalah.bot.State;
 import com.fivan.kalah.entity.Lobby;
 import com.fivan.kalah.service.LobbyService;
 import com.fivan.kalah.service.PlayerService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -27,25 +26,35 @@ import static com.fivan.kalah.util.GameUtils.getUserIdFromMessage;
 import static java.util.Collections.singletonList;
 
 @Handler(State.IN_MENU)
-@RequiredArgsConstructor
 public class InMenuHandler implements StateHandler {
 
   private static final String URL_TEMPLATE_START = "https://telegram.me/";
   private static final String URL_TEMPLATE_END = "?start=";
-  private static final String CREATE_NEW_BUTTON_TEXT = "Create new";
-  private static final String GAME_RULES_BUTTON_TEXT = "Show rules";
   private final LobbyService lobbyService;
   private final PlayerService playerService;
-  private final ResourceBundle resourceBundle;
+  private final ResourceBundle messageBundle;
+  private final String botName;
+  private final String readRulesButtonText;
+  private final String createNewButtonText;
 
-  @Value("${bot.telegram.name}")
-  private String botName;
+  public InMenuHandler(
+      LobbyService lobbyService,
+      PlayerService playerService,
+      @Value("${bot.telegram.name}") String botName,
+      ResourceBundle messageBundle) {
+    this.lobbyService = lobbyService;
+    this.playerService = playerService;
+    this.messageBundle = messageBundle;
+    this.botName = botName;
+    this.createNewButtonText = messageBundle.getString("createNewButtonText");
+    this.readRulesButtonText = messageBundle.getString("readRulesButtonText");
+  }
 
   @Override
   public HandlingResult handle(Update update) {
     var botApiMethods = new ArrayList<BotApiMethod<?>>();
     Integer userId = getUserIdFromMessage(update);
-    if (update.getMessage().getText().equals(CREATE_NEW_BUTTON_TEXT)) {
+    if (update.getMessage().getText().equals(createNewButtonText)) {
       Lobby lobby =
           lobbyService.createLobby(
               Lobby.builder()
@@ -57,15 +66,15 @@ public class InMenuHandler implements StateHandler {
 
       botApiMethods.add(
           new SendMessage()
-              .setText(resourceBundle.getString("lobbyWasCreated"))
+              .setText(messageBundle.getString("lobbyWasCreated"))
               .setChatId(userId.longValue())
               .setReplyMarkup(createLobbyKeyboard(lobbyId)));
     }
-    if (update.getMessage().getText().equals(GAME_RULES_BUTTON_TEXT)) {
+    if (update.getMessage().getText().equals(readRulesButtonText)) {
       botApiMethods.add(
           new SendMessage()
               .setParseMode(ParseMode.MARKDOWN)
-              .setText(resourceBundle.getString("gameRules"))
+              .setText(messageBundle.getString("gameRules"))
               .setChatId(userId.longValue()));
     }
 
@@ -77,12 +86,12 @@ public class InMenuHandler implements StateHandler {
     Integer userId = getUserIdFromMessage(update);
     KeyboardRow gameRow = new KeyboardRow();
 
-    gameRow.add(CREATE_NEW_BUTTON_TEXT);
-    gameRow.add(GAME_RULES_BUTTON_TEXT);
+    gameRow.add(createNewButtonText);
+    gameRow.add(readRulesButtonText);
 
     return singletonList(
         new SendMessage()
-            .setText(resourceBundle.getString("chooseAction"))
+            .setText(messageBundle.getString("chooseAction"))
             .setReplyMarkup(new ReplyKeyboardMarkup().setKeyboard(List.of(gameRow)))
             .setChatId(userId.longValue()));
   }
@@ -90,7 +99,7 @@ public class InMenuHandler implements StateHandler {
   private ReplyKeyboard createLobbyKeyboard(UUID lobbyId) {
     InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
     InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-    inlineKeyboardButton.setText(resourceBundle.getString("joinGame"));
+    inlineKeyboardButton.setText(messageBundle.getString("joinGame"));
     inlineKeyboardButton.setUrl(URL_TEMPLATE_START + botName + URL_TEMPLATE_END + lobbyId);
     inlineKeyboardMarkup.setKeyboard(List.of(List.of(inlineKeyboardButton)));
     return inlineKeyboardMarkup;
