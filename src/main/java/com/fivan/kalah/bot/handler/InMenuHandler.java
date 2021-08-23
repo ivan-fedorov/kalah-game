@@ -1,5 +1,9 @@
 package com.fivan.kalah.bot.handler;
 
+import static com.fivan.kalah.util.GameUtils.getUserIdFromMessage;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.joining;
+
 import com.fivan.kalah.bot.Event;
 import com.fivan.kalah.bot.HandlingResult;
 import com.fivan.kalah.bot.State;
@@ -8,6 +12,10 @@ import com.fivan.kalah.entity.Player;
 import com.fivan.kalah.service.LobbyService;
 import com.fivan.kalah.service.PlayerService;
 import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -18,15 +26,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import static com.fivan.kalah.util.GameUtils.getUserIdFromMessage;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.joining;
 
 @Handler(State.IN_MENU)
 public class InMenuHandler implements StateHandler {
@@ -43,6 +42,7 @@ public class InMenuHandler implements StateHandler {
   private final String positionColumnName;
   private final String nameColumnName;
   private final String ratingColumnName;
+  private final String unknownCommandText;
 
   public InMenuHandler(
       LobbyService lobbyService,
@@ -59,6 +59,7 @@ public class InMenuHandler implements StateHandler {
     this.positionColumnName = messageBundle.getString("positionColumnName");
     this.nameColumnName = messageBundle.getString("nameColumnName");
     this.ratingColumnName = messageBundle.getString("ratingColumnName");
+    this.unknownCommandText = messageBundle.getString("unknownMenuCommand");
   }
 
   @Override
@@ -86,6 +87,7 @@ public class InMenuHandler implements StateHandler {
           new SendMessage()
               .setParseMode(ParseMode.MARKDOWN)
               .setText(messageBundle.getString("gameRules"))
+              .setReplyMarkup(buildMenuKeyboard())
               .setChatId(userId.longValue()));
     }
     if (update.getMessage().getText().equals(showTopTenPlayerButtonText)) {
@@ -123,6 +125,15 @@ public class InMenuHandler implements StateHandler {
           new SendMessage()
               .setParseMode(ParseMode.MARKDOWN)
               .setText(tableText)
+              .setReplyMarkup(buildMenuKeyboard())
+              .setChatId(userId.longValue()));
+    }
+
+    if (botApiMethods.isEmpty()) {
+      botApiMethods.add(
+          new SendMessage()
+              .setText(this.unknownCommandText)
+              .setReplyMarkup(buildMenuKeyboard())
               .setChatId(userId.longValue()));
     }
 
@@ -132,17 +143,20 @@ public class InMenuHandler implements StateHandler {
   @Override
   public List<BotApiMethod<?>> getInitialMethods(Update update) {
     Integer userId = getUserIdFromMessage(update);
-    KeyboardRow gameRow = new KeyboardRow();
-
-    gameRow.add(createNewButtonText);
-    gameRow.add(readRulesButtonText);
-    gameRow.add(showTopTenPlayerButtonText);
 
     return singletonList(
         new SendMessage()
             .setText(messageBundle.getString("chooseAction"))
-            .setReplyMarkup(new ReplyKeyboardMarkup().setKeyboard(List.of(gameRow)))
+            .setReplyMarkup(buildMenuKeyboard())
             .setChatId(userId.longValue()));
+  }
+
+  private ReplyKeyboardMarkup buildMenuKeyboard() {
+    KeyboardRow gameRow = new KeyboardRow();
+    gameRow.add(createNewButtonText);
+    gameRow.add(readRulesButtonText);
+    gameRow.add(showTopTenPlayerButtonText);
+    return new ReplyKeyboardMarkup().setKeyboard(List.of(gameRow));
   }
 
   private ReplyKeyboard createLobbyKeyboard(UUID lobbyId) {
