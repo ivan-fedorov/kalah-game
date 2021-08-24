@@ -1,14 +1,21 @@
 package com.fivan.kalah.bot.handler;
 
+import static com.fivan.kalah.util.GameUtils.getUserIdFromMessage;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.joining;
+
 import com.fivan.kalah.bot.Event;
 import com.fivan.kalah.bot.HandlingResult;
 import com.fivan.kalah.bot.State;
 import com.fivan.kalah.entity.Lobby;
 import com.fivan.kalah.entity.Player;
-import com.fivan.kalah.repository.GameStatisticsRepository;
 import com.fivan.kalah.service.LobbyService;
 import com.fivan.kalah.service.PlayerService;
 import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -20,13 +27,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static com.fivan.kalah.util.GameUtils.getUserIdFromMessage;
-import static java.util.Collections.singletonList;
-import static java.util.stream.Collectors.joining;
-
 @Handler(State.IN_MENU)
 public class InMenuHandler implements StateHandler {
 
@@ -34,7 +34,6 @@ public class InMenuHandler implements StateHandler {
   private static final String URL_TEMPLATE_END = "?start=";
   private final LobbyService lobbyService;
   private final PlayerService playerService;
-  private final GameStatisticsRepository gameStatisticsRepository;
   private final ResourceBundle messageBundle;
   private final String botName;
   private final String readRulesButtonText;
@@ -43,18 +42,15 @@ public class InMenuHandler implements StateHandler {
   private final String positionColumnName;
   private final String nameColumnName;
   private final String ratingColumnName;
-  private final String totalGamesColumnName;
   private final String unknownCommandText;
 
   public InMenuHandler(
       LobbyService lobbyService,
       PlayerService playerService,
-      GameStatisticsRepository gameStatisticsRepository,
       @Value("${bot.telegram.name}") String botName,
       ResourceBundle messageBundle) {
     this.lobbyService = lobbyService;
     this.playerService = playerService;
-    this.gameStatisticsRepository = gameStatisticsRepository;
     this.messageBundle = messageBundle;
     this.botName = botName;
     this.createNewButtonText = messageBundle.getString("createNewButtonText");
@@ -63,7 +59,6 @@ public class InMenuHandler implements StateHandler {
     this.positionColumnName = messageBundle.getString("positionColumnName");
     this.nameColumnName = messageBundle.getString("nameColumnName");
     this.ratingColumnName = messageBundle.getString("ratingColumnName");
-    this.totalGamesColumnName = messageBundle.getString("totalGamesColumnName");
     this.unknownCommandText = messageBundle.getString("unknownMenuCommand");
   }
 
@@ -101,24 +96,18 @@ public class InMenuHandler implements StateHandler {
       int maxNameSize =
           topTenPlayers.stream().map(Player::getName).mapToInt(String::length).max().orElseThrow();
       ArrayList<List<String>> tableRow = new ArrayList<>();
-      tableRow.add(
-          List.of(positionColumnName, nameColumnName, ratingColumnName, totalGamesColumnName));
+      tableRow.add(List.of(positionColumnName, nameColumnName, ratingColumnName));
       tableRow.add(
           List.of(
               "-".repeat(positionColumnName.length()),
               "-".repeat(maxNameSize),
-              "-".repeat(ratingColumnName.length()),
-              "-".repeat(totalGamesColumnName.length())));
-      Map<Integer, Integer> gamesByPlayerId =
-          gameStatisticsRepository.gamesByPlayerId(
-              topTenPlayers.stream().map(Player::getId).collect(Collectors.toSet()));
+              "-".repeat(ratingColumnName.length())));
       for (int i = 0; i < topTenPlayers.size(); i++) {
         tableRow.add(
             List.of(
                 String.valueOf(i + 1),
                 topTenPlayers.get(i).getName(),
-                topTenPlayers.get(i).getRating().toString(),
-                gamesByPlayerId.getOrDefault(topTenPlayers.get(i).getId(), 0).toString()));
+                topTenPlayers.get(i).getRating().toString()));
       }
 
       String tableText =
@@ -128,8 +117,7 @@ public class InMenuHandler implements StateHandler {
                       List.of(
                           Strings.padEnd(row.get(0), positionColumnName.length(), ' '),
                           Strings.padEnd(row.get(1), maxNameSize, ' '),
-                          Strings.padEnd(row.get(2), ratingColumnName.length(), ' '),
-                          Strings.padEnd(row.get(3), totalGamesColumnName.length(), ' ')))
+                          Strings.padEnd(row.get(2), ratingColumnName.length(), ' ')))
               .map(row -> row.stream().collect(joining(" | ", "| ", " |")))
               .collect(joining("\n", "```\n", "\n```"));
 
