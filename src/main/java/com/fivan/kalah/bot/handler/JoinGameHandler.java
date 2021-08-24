@@ -44,16 +44,30 @@ public class JoinGameHandler {
       return Optional.empty();
     }
 
+    Integer playerId = GameUtils.getUserIdFromMessage(update);
+
     String potentialLobbyId = splitMessage[1];
     try {
       UUID lobbyId = UUID.fromString(potentialLobbyId);
-      Lobby lobby =
-          lobbyService
-              .findEmptyLobbyById(lobbyId)
-              .orElseThrow(
-                  () -> new IllegalArgumentException("Couldn't find lobby with id " + lobbyId));
+      Optional<Lobby> optionalLobby = lobbyService.findEmptyLobbyById(lobbyId);
+      if (optionalLobby.isEmpty()) {
+        SendMessage joinFailedMessage =
+            new SendMessage()
+                .setText(messageBundle.getString("lobbyIsFull"))
+                .setChatId(playerId.toString());
+
+        botApiMethods.add(joinFailedMessage);
+
+        return Optional.of(
+            HandlingResult.builder()
+                .event(Event.TO_MENU)
+                .methods(botApiMethods)
+                .actions(actions)
+                .build());
+      }
+
+      Lobby lobby = optionalLobby.get();
       Integer opponentPlayerId = lobby.getPlayerId();
-      Integer playerId = GameUtils.getUserIdFromMessage(update);
       BoardRepresentation board = gameService.createGame(opponentPlayerId, playerId);
       Player playerTwo = playerService.getById(playerId).orElseThrow();
       lobbyService.handlePlayerTwoJoining(lobbyId, board.getId(), playerTwo);
