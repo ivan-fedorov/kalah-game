@@ -14,7 +14,9 @@ public interface LobbyRepository extends CrudRepository<Lobby, UUID> {
 
   Optional<Lobby> findByIdAndBoardIdIsNull(UUID id);
 
-  List<Lobby> findTop5ByPlayerOne_RatingGreaterThanEqualOrderByPlayerOne_RatingAsc(Integer rating);
+  List<Lobby> findTop5ByPlayerOne_RatingGreaterThanOrderByPlayerOne_RatingAsc(Integer rating);
 
-  List<Lobby> findTop5ByPlayerOne_RatingLessThanEqualOrderByPlayerOne_RatingDesc(Integer rating);
+  List<Lobby> findTop5ByPlayerOne_RatingLessThanOrderByPlayerOne_RatingDesc(Integer rating);
+
+  List<Lobby> findTop10ByPlayerOne_Rating(Integer rating);
 }
